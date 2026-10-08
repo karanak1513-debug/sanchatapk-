@@ -3,7 +3,7 @@ import { RELEASE_CONFIG } from '@/config/release';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   const token = process.env.GITHUB_TOKEN;
 
   // If GITHUB_TOKEN is available, fetch the authenticated pre-signed asset download URL
@@ -35,8 +35,8 @@ export async function GET() {
     }
   }
 
-  // Fallback: direct latest release download URL
-  return NextResponse.redirect(RELEASE_CONFIG.githubDirectDownloadUrl, {
+  // Resilient fallback: direct static binary served from Vercel CDN (/downloads/sanchat-release.apk)
+  return NextResponse.redirect(new URL('/downloads/sanchat-release.apk', request.url), {
     status: 307,
     headers: {
       'Cache-Control': 'no-cache, no-store, must-revalidate',

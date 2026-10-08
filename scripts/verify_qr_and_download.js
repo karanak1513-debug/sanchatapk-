@@ -6,7 +6,7 @@ const RELEASE_CONFIG = {
   downloadRoute: '/download',
   githubDirectDownloadUrl:
     'https://github.com/karanak1513-debug/sanchat-core-apk/releases/latest/download/sanchat-release.apk',
-  sizeBytes: 65404536,
+  sizeBytes: 65271909,
   filename: 'sanchat-release.apk',
 };
 

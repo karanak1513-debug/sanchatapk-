@@ -141,9 +141,10 @@ async function main() {
 - **Package ID**: \`com.aistudio.sanchay.savtrkr\`
 - **Target SDK**: Android 16 (API 36)
 - **Compile SDK**: Android 16+ (API 37)
-- **Min SDK**: Android 8.0 (API 26)
-- **SHA-256**: \`d43668da9f1f73de86a731326f0fe5d72d16581754530ff2c7fbcc693ab45c49\`
-- **Asset**: \`sanchat-release.apk\` (65,404,536 bytes / 62.4 MB)
+- **Min SDK**: Android 7.0+ (API 24)
+- **Signing**: Scheme v1 (JAR), v2 (Full APK), v3 (Android 9+) Verified
+- **SHA-256**: \`38f784ac1713871e6f33f6d5b39a767fdf226f95371400504298c5305a71a1d8\`
+- **Asset**: \`sanchat-release.apk\` (65,271,909 bytes / 62.2 MB)
 
 Official cryptographic signature and deterministic verification release.`,
         draft: false,
@@ -156,8 +157,31 @@ Official cryptographic signature and deterministic verification release.`,
     }
     release = JSON.parse(createRes.body);
     console.log(`Created release with ID ${release.id}.`);
-  } else {
-    console.log(`Found existing release ID ${release.id} for tag ${tag}.`);
+    console.log(`Found existing release ID ${release.id} for tag ${tag}. Updating description...`);
+    await githubRequest(
+      `https://api.github.com/repos/${owner}/${repo}/releases/${release.id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+      JSON.stringify({
+        name: 'Sanchat v1.0.0 (Build 1) — Official Production Release',
+        body: `## Sanchat Android Universal Release v1.0.0
+
+- **Package ID**: \`com.aistudio.sanchay.savtrkr\`
+- **Target SDK**: Android 16 (API 36)
+- **Compile SDK**: Android 16+ (API 37)
+- **Min SDK**: Android 7.0+ (API 24)
+- **Signing**: Scheme v1 (JAR), v2 (Full APK), v3 (Android 9+) Verified
+- **SHA-256**: \`38f784ac1713871e6f33f6d5b39a767fdf226f95371400504298c5305a71a1d8\`
+- **Asset**: \`sanchat-release.apk\` (65,271,909 bytes / 62.2 MB)
+
+Official cryptographic signature and deterministic verification release.`,
+      })
+    );
   }
 
   // Check if asset sanchat-release.apk already exists

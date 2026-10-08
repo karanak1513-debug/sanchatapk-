@@ -11,12 +11,13 @@ import {
   Sparkles,
 } from 'lucide-react';
 import MobileCockpit from './MobileCockpit';
+import { RELEASE_CONFIG } from '@/config/release';
 
 export default function Hero() {
   return (
     <section className="relative pt-28 pb-16 md:pt-36 md:pb-24 overflow-hidden bg-emerald-atmosphere bg-subtle-dots">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Column: Headlines & Actions */}
           <div className="lg:col-span-7 flex flex-col items-start text-left z-10">
             {/* Feature Pill Badge */}
@@ -53,7 +54,7 @@ export default function Hero() {
                 <ArrowDownToLine className="w-5 h-5 text-emeraldAccent group-hover:translate-y-0.5 transition-transform" />
                 <span>Download Sanchat APK</span>
                 <span className="text-xs font-mono font-normal text-slate-300 bg-slate-800 px-2 py-0.5 rounded-md">
-                  62.4 MB
+                  {RELEASE_CONFIG.sizeFormatted.split(' ')[0]} {RELEASE_CONFIG.sizeFormatted.split(' ')[1]}
                 </span>
               </a>
 

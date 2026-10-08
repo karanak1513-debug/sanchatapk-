@@ -4,10 +4,9 @@ import React, { useState } from 'react';
 import {
   Bell,
   Cpu,
-  Tag,
-  BookOpen,
+  Landmark,
+  MessageSquare,
   TrendingUp,
-  ShieldCheck,
   ArrowRight,
   CheckCircle2,
 } from 'lucide-react';
@@ -18,57 +17,48 @@ export default function MoneyFlow() {
   const steps = [
     {
       id: 'step-1',
-      title: 'Incoming Notification',
-      badge: 'Step 01',
+      title: 'Connect',
+      badge: '01 — Connect',
       icon: Bell,
-      desc: 'Legitimate financial bank SMS headers (HDFC, SBI, ICICI, etc.) are received directly on your Android device.',
-      demoSnippet: 'HDFC: "₹500.00 debited from A/c XX1234 on 08-OCT via UPI Ref 928374..."',
+      desc: 'Sanchat works with your supported transaction notifications and verified bank SMS alerts in real time.',
+      demoSnippet: 'NOTIFICATION INTERCEPT: Verified financial bank SMS received securely on-device.',
       indicatorColor: 'text-blue-500 bg-blue-50 border-blue-200',
     },
     {
       id: 'step-2',
-      title: 'Transaction Recognition',
-      badge: 'Step 02',
+      title: 'Track',
+      badge: '02 — Track',
       icon: Cpu,
-      desc: 'Defensive 8-rule parsing engine filters promotional noise and extracts debit/credit amounts with account evidence.',
-      demoSnippet: 'DEFENSE PASS: Debit ₹500.00 • Marketing check: Clean • Ref: #928374',
+      desc: 'Transactions are categorized automatically on-device with defensive spam and promotion filters.',
+      demoSnippet: 'DEFENSE ENGINE: Promotional spam rejected • Legitimate bank debit indexed.',
       indicatorColor: 'text-amber-500 bg-amber-50 border-amber-200',
     },
     {
       id: 'step-3',
-      title: 'Auto-Categorization',
-      badge: 'Step 03',
-      icon: Tag,
-      desc: 'Merchant headers & UPI handles are tagged into clean buckets (Food, Fuel, Utilities, Rent) without cloud surveillance.',
-      demoSnippet: 'CATEGORY: Dining & Essentials • Merchant: Swiggy Instamart',
-      indicatorColor: 'text-purple-500 bg-purple-50 border-purple-200',
-    },
-    {
-      id: 'step-4',
-      title: 'Deterministic Ledger',
-      badge: 'Step 04',
-      icon: BookOpen,
-      desc: 'A cryptographic SHA-256 fingerprint deduplicates every event, ensuring you never double-count an expense.',
-      demoSnippet: 'FINGERPRINT: sha256(hdfc:928374:500:20261008) • Deduplicated',
+      title: 'Save',
+      badge: '03 — Save',
+      icon: Landmark,
+      desc: 'Create vaults and build savings discipline with atomic accumulation targets and run-rate pacing.',
+      demoSnippet: 'VAULT ENGINE: Emergency Fund & Discretionary Reserve paced against your target dates.',
       indicatorColor: 'text-emerald-500 bg-emerald-50 border-emerald-200',
     },
     {
-      id: 'step-5',
-      title: 'Runway Recalculation',
-      badge: 'Step 05',
-      icon: TrendingUp,
-      desc: 'Your daily safe spending allowance automatically recalculates to keep your month on track without manual math.',
-      demoSnippet: 'RUNWAY: ₹1,500/day -> Adjusted to ₹1,480/day (22 Days Safe)',
-      indicatorColor: 'text-darkEmerald bg-emerald-50 border-emerald-200',
+      id: 'step-4',
+      title: 'Chat',
+      badge: '04 — Chat',
+      icon: MessageSquare,
+      desc: "Connect with people through Sanchat's private messaging layer with deterministic thread isolation.",
+      demoSnippet: 'PRIVATE MESSAGING: Authenticated 1-on-1 thread with zero cross-tenant visibility.',
+      indicatorColor: 'text-purple-500 bg-purple-50 border-purple-200',
     },
     {
-      id: 'step-6',
-      title: 'Vault Allocation',
-      badge: 'Step 06',
-      icon: ShieldCheck,
-      desc: 'Disciplined surpluses route into dedicated multi-vaults with atomic increment tracking and paced targets.',
-      demoSnippet: 'VAULT ALLOCATION: Master Reserve Target: ₹30,000 / ₹1,00,000',
-      indicatorColor: 'text-emeraldAccent bg-emerald-950 border-emerald-700',
+      id: 'step-5',
+      title: 'Grow',
+      badge: '05 — Grow',
+      icon: TrendingUp,
+      desc: 'Use runway, vaults and challenges to improve financial discipline and track daily burn safely.',
+      demoSnippet: 'FINANCIAL RUNWAY: Safe daily spending allowance calibrated dynamically.',
+      indicatorColor: 'text-darkEmerald bg-emerald-50 border-emerald-200',
     },
   ];
 
@@ -78,14 +68,14 @@ export default function MoneyFlow() {
         {/* Section Header */}
         <div className="max-w-3xl mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white border border-cardBorder text-slateText text-xs font-mono font-medium mb-3 shadow-subtle">
-            SYSTEM ARCHITECTURE
+            HOW SANCHAT WORKS
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-obsidian tracking-tight mb-4">
-            Your Money,{' '}
-            <span className="text-darkEmerald">Finally in Motion.</span>
+            How Sanchat{' '}
+            <span className="text-darkEmerald">Works.</span>
           </h2>
           <p className="text-base sm:text-lg text-slateText leading-relaxed">
-            From the exact millisecond your bank triggers a notification to your updated spending runway and long-term savings goals. All computed on-device with zero bank passwords.
+            From the moment a transaction arrives to automated on-device tracking, disciplined multi-vault savings, private 1-on-1 messaging, and runway intelligence.
           </p>
         </div>
 
