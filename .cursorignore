@@ -1,0 +1,11 @@
+build/
+.dart_tool/
+.git/
+android/.gradle/
+android/app/build/
+android/upload-keystore.jks
+ios/Pods/
+assets/
+*.apk
+*.jks
+*.lock

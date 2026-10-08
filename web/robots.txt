@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /cockpit
+Disallow: /download
+
+Sitemap: https://sanchay.app/sitemap.xml

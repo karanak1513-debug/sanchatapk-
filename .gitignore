@@ -1,0 +1,76 @@
+# Android Security & Signing Keys (ABSOLUTE BLOCK)
+*.jks
+*.keystore
+android/key.properties
+android/app/*.jks
+android/app/*.keystore
+
+# Google & Firebase Private Secrets
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+firebase_options.dart.secret
+*.secrets.json
+
+# Local Environment Variables & Caches
+.env
+*.env
+*.env.*
+local.properties
+
+# Build Outputs & Binary Blobs
+build/
+.dart_tool/
+.idea/
+.vscode/
+*.apk
+*.aab
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ / IDE
+*.iml
+*.ipr
+*.iws
+
+# Flutter / Dart / Pub
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication & Obfuscation
+app.*.symbols
+app.*.map.json
+
+# Android Studio artifacts
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Widget Preview
+.widget_preview/
+
+# Additional Secret Protection
+service-account*.json
+serviceAccount*.json
+*service_account*.json
+*.pem
+*.p12
+*.cer
+*.key
+google-services-private.json

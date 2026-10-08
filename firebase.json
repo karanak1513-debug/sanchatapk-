@@ -1,0 +1,15 @@
+{
+  "firestore": [
+    {
+      "database": "ai-studio-android-sanchay-c9654c5d-c4ca-4c5c-8b5e-20b5665d1fcb",
+      "rules": "firestore.rules",
+      "indexes": "firestore.indexes.json"
+    }
+  ],
+  "storage": [
+    {
+      "bucket": "gen-lang-client-0521710909.firebasestorage.app",
+      "rules": "storage.rules"
+    }
+  ]
+}

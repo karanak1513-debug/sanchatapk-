@@ -1,0 +1,8 @@
+# Google Play Release Signing Configuration Template
+# DO NOT COMMIT ACTUAL PASSWORDS OR KEYSTORES TO VERSION CONTROL.
+# Store your actual upload keystore in a secure local directory or CI secrets.
+
+storePassword=YOUR_SECURE_STORE_PASSWORD
+keyPassword=YOUR_SECURE_KEY_PASSWORD
+keyAlias=upload
+storeFile=upload-keystore.jks
