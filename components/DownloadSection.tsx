@@ -6,30 +6,42 @@ import {
   Smartphone,
   ShieldCheck,
   CheckCircle2,
-  AlertCircle,
   Clock,
+  Copy,
+  Check,
   ExternalLink,
 } from 'lucide-react';
 import DynamicQrCode from './DynamicQrCode';
 import ReleaseVerificationCard from './ReleaseVerificationCard';
+import { RELEASE_CONFIG } from '@/config/release';
+import Link from 'next/link';
 
 export default function DownloadSection() {
   const [downloadStarted, setDownloadStarted] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, field: string) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2500);
+    }
+  };
 
   const handleDownloadClick = () => {
     setDownloadStarted(true);
-    // Real intentional download of verified local APK
-    const link = document.createElement('a');
-    link.href = '/downloads/sanchat-release.apk';
-    link.download = 'sanchat-release.apk';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Navigates directly to the official /download route which handles the server-side release redirect
+    window.location.href = RELEASE_CONFIG.downloadRoute;
 
     setTimeout(() => {
       setDownloadStarted(false);
     }, 6000);
   };
+
+  const fullDownloadUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}${RELEASE_CONFIG.downloadRoute}`
+      : `${RELEASE_CONFIG.officialDomain}${RELEASE_CONFIG.downloadRoute}`;
 
   return (
     <section id="download" className="py-20 md:py-28 bg-[#F8FAFC] border-t border-cardBorder relative">
@@ -62,18 +74,18 @@ export default function DownloadSection() {
                       Sanchat for Android
                     </h3>
                     <p className="text-xs text-slateText">
-                      Universal Release • Target SDK 36 (Android 16)
+                      Universal Release • {RELEASE_CONFIG.targetSdk}
                     </p>
                   </div>
                 </div>
                 <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-darkEmerald border border-emerald-200">
-                  v1.0.0+1
+                  v{RELEASE_CONFIG.version}
                 </span>
               </div>
 
               {/* Download Buttons Stack */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-6">
-                {/* Primary APK Download Button */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-4">
+                {/* Primary APK Download Button targeting /download */}
                 <button
                   type="button"
                   onClick={handleDownloadClick}
@@ -82,15 +94,54 @@ export default function DownloadSection() {
                   <ArrowDownToLine className="w-5 h-5 text-emeraldAccent group-hover:translate-y-0.5 transition-transform" />
                   <span>Download Sanchat APK</span>
                   <span className="text-xs font-mono font-normal text-slate-300 bg-slate-800 px-2 py-0.5 rounded-md">
-                    62.4 MB
+                    {RELEASE_CONFIG.sizeFormatted.split(' ')[0]} {RELEASE_CONFIG.sizeFormatted.split(' ')[1]}
                   </span>
                 </button>
 
-                {/* Legitimate Google Play Placeholder (No Fake URL) */}
+                {/* Google Play Status Indicator */}
                 <div className="flex-1 flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-slate-100 text-slate-500 font-semibold text-sm border border-slate-200 cursor-not-allowed select-none">
                   <Clock className="w-4 h-4 text-slate-400" />
-                  <span>Google Play — Coming Soon</span>
+                  <span>Google Play — In Review</span>
                 </div>
+              </div>
+
+              {/* Secondary Action Row: Copy URL & Copy Hash */}
+              <div className="flex items-center gap-3 mb-6">
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(fullDownloadUrl, 'dl-btn')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-xs font-medium text-slate-700 transition-colors"
+                >
+                  {copiedField === 'dl-btn' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-darkEmerald" />
+                      <span className="text-darkEmerald font-semibold">URL Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Copy Download URL</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(RELEASE_CONFIG.sha256, 'hash-btn')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-xs font-medium text-slate-700 transition-colors"
+                >
+                  {copiedField === 'hash-btn' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-darkEmerald" />
+                      <span className="text-darkEmerald font-semibold">SHA-256 Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Copy SHA-256</span>
+                    </>
+                  )}
+                </button>
               </div>
 
               {/* Download status toast */}
@@ -98,7 +149,7 @@ export default function DownloadSection() {
                 <div className="p-3.5 mb-6 rounded-xl bg-emerald-50 border border-emerald-200 text-darkEmerald text-xs flex items-center gap-2 animate-in fade-in duration-300">
                   <CheckCircle2 className="w-4 h-4 text-emeraldAccent shrink-0" />
                   <span>
-                    Official APK download started (`sanchat-release.apk`, 62.4 MB). If it didn&apos;t trigger, check browser pop-up permissions.
+                    Official download initiating via <code className="font-mono font-bold">/download</code> ({RELEASE_CONFIG.filename}, {RELEASE_CONFIG.sizeFormatted.split(' ')[0]} {RELEASE_CONFIG.sizeFormatted.split(' ')[1]}). Check browser notification drawer if prompt does not appear immediately.
                   </span>
                 </div>
               )}
@@ -110,22 +161,22 @@ export default function DownloadSection() {
                   <span>Legitimate Android Installation Guide</span>
                 </div>
                 <p className="leading-relaxed">
-                  1. Tap <strong>Download Sanchat APK</strong> and accept the browser download prompt.
+                  1. Tap <strong>Download Sanchat APK</strong> to retrieve the official package.
                 </p>
                 <p className="leading-relaxed">
-                  2. Open the downloaded file from your notifications or Files app. If Android prompts for &ldquo;Install unknown apps&rdquo;, enable permission for your browser.
+                  2. Open the downloaded file from your notifications or Files app. If Android prompts for &ldquo;Install unknown apps&rdquo;, allow access for your browser.
                 </p>
                 <p className="leading-relaxed">
-                  3. Verify that the file matches the official SHA-256 checksum displayed below before installing.
+                  3. Verify that the file checksum matches our official SHA-256 hash below before finalizing installation.
                 </p>
               </div>
             </div>
 
             <div className="pt-6 mt-6 border-t border-cardBorder flex flex-wrap items-center justify-between text-xs text-slateText">
-              <span>Google Play Listing in Preparation</span>
-              <a href="#verification" className="text-darkEmerald font-semibold hover:underline">
-                View Cryptographic Checksum ↓
-              </a>
+              <span>Google Play Submission in Preparation</span>
+              <Link href="/verification" className="text-darkEmerald font-semibold hover:underline">
+                Full Cryptographic Verification Center →
+              </Link>
             </div>
           </div>
 

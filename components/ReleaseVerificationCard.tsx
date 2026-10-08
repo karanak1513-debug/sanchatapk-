@@ -6,24 +6,12 @@ import {
   Copy,
   Check,
   Terminal,
-  FileCode,
   FileCheck,
 } from 'lucide-react';
+import { RELEASE_CONFIG } from '@/config/release';
 
 export default function ReleaseVerificationCard() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
-
-  const releaseMetadata = {
-    version: '1.0.0+1',
-    packageId: 'com.aistudio.sanchay.savtrkr',
-    targetSdk: 'Android 16 (API 36)',
-    minSdk: 'Android 8.0 (API 26)',
-    filename: 'sanchat-release.apk',
-    sizeFormatted: '62.4 MB (65,404,536 bytes)',
-    sha256: 'd43668da9f1f73de86a731326f0fe5d72d16581754530ff2c7fbcc693ab45c49',
-    signatureScheme: 'APK Signature Scheme v2 (Signed)',
-    signerSubject: 'CN=Sanchay, OU=Fintech, O=Sanchay, L=Delhi, ST=Delhi, C=IN',
-  };
 
   const copyToClipboard = (text: string, field: string) => {
     if (navigator.clipboard) {
@@ -58,7 +46,7 @@ export default function ReleaseVerificationCard() {
 
         <button
           type="button"
-          onClick={() => copyToClipboard(releaseMetadata.sha256, 'all-hash')}
+          onClick={() => copyToClipboard(RELEASE_CONFIG.sha256, 'all-hash')}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-mono text-slate-200 border border-slate-700 transition-all self-start sm:self-auto"
         >
           {copiedField === 'all-hash' ? (
@@ -83,11 +71,11 @@ export default function ReleaseVerificationCard() {
             <span className="text-[10px] text-slate-500 uppercase block mb-0.5 font-sans">
               Package ID
             </span>
-            <span className="text-slate-200 font-bold">{releaseMetadata.packageId}</span>
+            <span className="text-slate-200 font-bold">{RELEASE_CONFIG.packageId}</span>
           </div>
           <button
             type="button"
-            onClick={() => copyToClipboard(releaseMetadata.packageId, 'pkg')}
+            onClick={() => copyToClipboard(RELEASE_CONFIG.packageId, 'pkg')}
             className="p-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white"
             aria-label="Copy Package ID"
           >
@@ -106,7 +94,7 @@ export default function ReleaseVerificationCard() {
               Version & Target SDK
             </span>
             <span className="text-emerald-400 font-bold">
-              v{releaseMetadata.version} • {releaseMetadata.targetSdk}
+              v{RELEASE_CONFIG.version} • {RELEASE_CONFIG.targetSdk}
             </span>
           </div>
           <span className="text-[10px] text-slate-400 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
@@ -120,9 +108,9 @@ export default function ReleaseVerificationCard() {
             <span className="text-[10px] text-slate-500 uppercase block mb-0.5 font-sans">
               Official Binary File
             </span>
-            <span className="text-slate-200">{releaseMetadata.filename}</span>
+            <span className="text-slate-200">{RELEASE_CONFIG.filename}</span>
           </div>
-          <span className="text-slate-300 font-semibold">{releaseMetadata.sizeFormatted}</span>
+          <span className="text-slate-300 font-semibold">{RELEASE_CONFIG.sizeFormatted}</span>
         </div>
 
         {/* Signature Status */}
@@ -132,7 +120,7 @@ export default function ReleaseVerificationCard() {
               Release Signing Scheme
             </span>
             <span className="text-emerald-400 font-semibold">
-              {releaseMetadata.signatureScheme}
+              {RELEASE_CONFIG.signatureScheme}
             </span>
           </div>
           <FileCheck className="w-4 h-4 text-emerald-400" />
@@ -149,7 +137,7 @@ export default function ReleaseVerificationCard() {
             </span>
           </div>
           <div className="text-xs text-emerald-300 break-all select-all p-2 rounded bg-slate-900 border border-slate-800 font-mono">
-            {releaseMetadata.sha256}
+            {RELEASE_CONFIG.sha256}
           </div>
         </div>
       </div>
