@@ -26,8 +26,7 @@ import '../widgets/sms_parser_modal.dart';
 import '../widgets/spending_trend_chart.dart';
 import '../widgets/brand_logo.dart';
 import 'chat_messages_list_screen.dart';
-import 'app_guide_screen.dart';
-import 'gamification_hub_screen.dart';
+import '../widgets/steps_sheet.dart';
 
 class DashboardScreen extends StatefulWidget {
   final VoidCallback? onOpenSettings;
@@ -279,11 +278,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                     const SizedBox(height: 16),
                   ],
 
-                  // Contextual First-Time Guide Tip Capsule
-                  if (isFirst3Sessions) ...[
-                    _buildContextualGuideTip(),
-                    const SizedBox(height: 16),
-                  ],
+
 
                   // =========================================================
                   // BENTO CARD A: THE RUNWAY DIAL (DAILY SAFE-TO-SPEND)
@@ -393,16 +388,9 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Guide Action Pill
+                        // Steps Action Pill
                         _TactileBounce(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const AppGuideScreen(),
-                              ),
-                            );
-                          },
+                          onTap: () => StepsSheet.show(context),
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                             decoration: BoxDecoration(
@@ -420,46 +408,10 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: const [
-                                Icon(Icons.explore_outlined, size: 14, color: AppColors.emerald),
+                                Icon(Icons.route_outlined, size: 13, color: AppColors.emerald),
                                 SizedBox(width: 4),
                                 Text(
-                                  'Guide',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.obsidian,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        // Gamification & Pet Hub Pill
-                        _TactileBounce(
-                          onTap: () => GamificationHubScreen.show(context),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(999),
-                              border: Border.all(color: Colors.black.withOpacity(0.08)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.obsidian.withOpacity(0.03),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Text('🐣', style: TextStyle(fontSize: 12)),
-                                SizedBox(width: 3),
-                                Text(
-                                  'Hub',
+                                  'Steps',
                                   style: TextStyle(
                                     fontFamily: 'Inter',
                                     fontSize: 11,
@@ -664,43 +616,6 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
     }
 
 
-  // ===========================================================================
-  // CONTEXTUAL GUIDE TIP CAPSULE
-  // ===========================================================================
-  Widget _buildContextualGuideTip() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEFF6FF),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFBFDBFE)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: const BoxDecoration(
-              color: Color(0xFF2563EB),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.tips_and_updates, size: 14, color: Colors.white),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'Quick tip: Tap the (+) button below anytime to log a manual deposit or expense.',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF1E3A8A),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // ===========================================================================
   // PERMISSION BANNER WITH PULSING BEACON

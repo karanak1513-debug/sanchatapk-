@@ -1663,7 +1663,7 @@ class _PreferencesScreenState extends State<PreferencesScreen>
             ),
             icon: const Text('🐣', style: TextStyle(fontSize: 18)),
             label: const Text(
-              'Discipline Hub, Saving Pet & Universe',
+              'Discipline & Wealth Universe',
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 13,
