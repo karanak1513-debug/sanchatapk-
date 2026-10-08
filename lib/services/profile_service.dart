@@ -77,7 +77,9 @@ class ProfileService {
       final updates = <String, dynamic>{
         'uid': uid,
         'displayName': resolvedDisplayName,
+        'displayName_lowercase': resolvedDisplayName.trim().toLowerCase(),
         'handle': normalizedHandle,
+        'handle_lowercase': normalizedHandle.trim().toLowerCase(),
         'isVerified': true,
         'updatedAt': FieldValue.serverTimestamp(),
       };

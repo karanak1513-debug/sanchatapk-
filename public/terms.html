@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms & Conditions — Sanchay Wealth</title>
+  <meta name="description" content="Sanchay Terms of Service: Autonomous expense analyzer and self-discipline utility. Financial disclaimers and user terms.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #F8FAFC;
+      --bg-surface: #FFFFFF;
+      --card-border: #E2E8F0;
+      --emerald: #059669;
+      --emerald-subtle: #ECFDF5;
+      --emerald-border: #A7F3D0;
+      --danger: #DC2626;
+      --danger-subtle: #FEF2F2;
+      --danger-border: #FECACA;
+      --text-main: #0F172A;
+      --text-muted: #475569;
+      --text-dim: #94A3B8;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+      --shadow-float: 0 20px 40px -15px rgba(15, 23, 42, 0.07);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.65;
+      padding: 0 20px 80px;
+      overflow-x: hidden;
+    }
+    .header-bar {
+      max-width: 900px;
+      margin: 24px auto 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      background: #FFFFFF;
+      border: 1px solid var(--card-border);
+      border-radius: 9999px;
+      box-shadow: var(--shadow-sm);
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .brand-logo-sq {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #FFFFFF;
+      font-size: 15px;
+    }
+    .nav-btn {
+      padding: 8px 18px;
+      background: var(--bg-canvas);
+      color: var(--emerald);
+      border: 1px solid var(--emerald-border);
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .nav-btn:hover {
+      background: var(--emerald);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--danger-subtle);
+      border: 1px solid var(--danger-border);
+      border-radius: 9999px;
+      color: var(--danger);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+    .last-updated {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      font-family: var(--font-mono);
+    }
+    .policy-card {
+      background: #FFFFFF;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .policy-card h2 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .policy-card h2::before {
+      content: "";
+      width: 4px;
+      height: 18px;
+      background: var(--emerald);
+      border-radius: 2px;
+    }
+    .policy-card.warning h2::before {
+      background: var(--danger);
+    }
+    .policy-card p {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .policy-card p:last-child { margin-bottom: 0; }
+    .policy-card ul {
+      margin: 12px 0 12px 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .policy-card li { margin-bottom: 6px; }
+    .footer-note {
+      text-align: center;
+      margin-top: 48px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <header class="header-bar">
+    <a href="/" class="brand-group">
+      <div class="brand-logo-sq">S</div>
+      <span>SANCHAY</span>
+    </a>
+    <a href="/" class="nav-btn">← Back to Showcase</a>
+  </header>
+
+  <main class="container">
+    <div class="badge">LEGAL COMPLIANCE &amp; DISCLAIMER</div>
+    <h1>Terms of Service &amp; Disclaimer</h1>
+    <div class="last-updated">Last Updated: October 8, 2026 • Product: Sanchay Wealth App</div>
+
+    <article class="policy-card warning">
+      <h2>1. Financial &amp; Investment Disclaimer (Mandatory Regulatory Notice)</h2>
+      <p><strong>Sanchay is an autonomous personal expense tracker, ledger organizer, and behavioral financial discipline utility.</strong></p>
+      <p>Sanchay is <strong>NOT</strong>:</p>
+      <ul>
+        <li>A banking entity, non-banking financial company (NBFC), or payment wallet custodian.</li>
+        <li>A SEBI-registered Investment Adviser (RIA), Portfolio Manager, or stock research analyst.</li>
+        <li>A credit score provider, lender, or loan originator.</li>
+      </ul>
+      <p>Calculations such as "Safe-to-Spend Runway", "Burn Rate", and "Target Vault Pacing" are algorithmic projections based strictly on user-supplied or on-device parsed transaction histories. They do not constitute financial advice, tax planning, or investment guarantees.</p>
+    </article>
+
+    <article class="policy-card">
+      <h2>2. Permitted Use &amp; Account Responsibilities</h2>
+      <p>You agree to use Sanchay strictly for personal wealth tracking and budgeting. You are responsible for:</p>
+      <ul>
+        <li>Maintaining physical security over your device and biometric locks.</li>
+        <li>Reviewing and verifying auto-parsed transactions for personal accuracy.</li>
+        <li>Complying with local data laws regarding device notifications.</li>
+      </ul>
+    </article>
+
+    <article class="policy-card">
+      <h2>3. Autonomous SMS and Notification Tracking</h2>
+      <p>Sanchay operates by parsing transient system notifications and bank SMS receipts when granted explicit OS permissions by the user. You may revoke these permissions at any time via your Android Device Settings without invalidating your account.</p>
+    </article>
+
+    <article class="policy-card">
+      <h2>4. Intellectual Property &amp; Brand Rights</h2>
+      <p>The Sanchay name, brand logo, software code, UI designs, and pacing algorithms are the proprietary property of Sanchay Wealth (Package: <code>com.aistudio.sanchay.savtrkr</code>). Unauthorized reverse engineering or redistribution is strictly prohibited.</p>
+    </article>
+
+    <article class="policy-card">
+      <h2>5. Limitation of Liability</h2>
+      <p>To the maximum extent permitted by applicable law, Sanchay and its developers shall not be liable for any indirect, incidental, or consequential damages resulting from banking notification delays, third-party SMS delivery failures, or user budgeting decisions.</p>
+    </article>
+
+    <article class="policy-card">
+      <h2>6. Governing Law &amp; Jurisdiction</h2>
+      <p>These terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law principles.</p>
+    </article>
+
+    <div class="footer-note">
+      © 2026 Sanchay Wealth. All rights reserved.
+    </div>
+  </main>
+</body>
+</html>

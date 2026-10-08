@@ -19,6 +19,7 @@ import '../widgets/top_glass_bar.dart';
 import '../services/statement_service.dart';
 import '../services/backup_service.dart';
 import '../widgets/brand_logo.dart';
+import 'gamification_hub_screen.dart';
 
 typedef SettingsScreen = PreferencesScreen;
 
@@ -1647,27 +1648,77 @@ class _PreferencesScreenState extends State<PreferencesScreen>
   }
 
   Widget _buildSignOutSection(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: OutlinedButton.icon(
-        onPressed: () => _showSignOutConfirmation(context),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.obsidianSlate,
-          side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.2),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          backgroundColor: Colors.white,
-        ),
-        icon: const Icon(Icons.logout_rounded, size: 18),
-        label: const Text(
-          'Sign Out of Sanchat',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: OutlinedButton.icon(
+            onPressed: () => GamificationHubScreen.show(context),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.obsidian,
+              side: BorderSide(color: AppColors.emerald.withOpacity(0.5), width: 1.4),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              backgroundColor: Colors.white,
+            ),
+            icon: const Text('🐣', style: TextStyle(fontSize: 18)),
+            label: const Text(
+              'Discipline Hub, Saving Pet & Universe',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.obsidian,
+              ),
+            ),
           ),
         ),
-      ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: OutlinedButton.icon(
+            onPressed: () => _showSignOutConfirmation(context),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.obsidianSlate,
+              side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.2),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              backgroundColor: Colors.white,
+            ),
+            icon: const Icon(Icons.logout_rounded, size: 18),
+            label: const Text(
+              'Sign Out of Sanchat',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: TextButton.icon(
+            onPressed: () => _showDeleteAccountConfirmation(context),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.crimson,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            icon: const Icon(Icons.delete_forever_rounded, size: 18, color: AppColors.crimson),
+            label: const Text(
+              'Delete Account & Data Permanently',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.crimson,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

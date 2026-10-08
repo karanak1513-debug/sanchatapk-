@@ -32,14 +32,17 @@ class ChatConversationScreen extends StatefulWidget {
   }) : _explicitChatId = chatId;
 
   String get chatId {
-    if (_explicitChatId != null && _explicitChatId.isNotEmpty) {
-      return _explicitChatId;
-    }
     String myUid = '';
     try {
       myUid = FirebaseAuth.instance.currentUser?.uid ?? '';
     } catch (_) {}
-    return ChatService().getChatId(myUid, peerUid);
+    if (myUid.isNotEmpty && peerUid.isNotEmpty) {
+      return ChatService.getDeterministicChatId(myUid, peerUid);
+    }
+    if (_explicitChatId != null && _explicitChatId.isNotEmpty) {
+      return _explicitChatId;
+    }
+    return ChatService.getDeterministicChatId(myUid, peerUid);
   }
 
   @override
@@ -359,7 +362,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen>
           style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800),
         ),
         content: const Text(
-          'Are you sure you want to permanently clear this chat? All messages will be physically deleted to free storage.',
+          'Are you sure you want to clear your chat history? The messages will be removed from your view.',
         ),
         actions: [
           TextButton(
@@ -369,14 +372,22 @@ class _ChatConversationScreenState extends State<ChatConversationScreen>
           ElevatedButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
-              await _chatService.clearEntireChatHistory(_chatId);
-              if (mounted) {
-                CenterAlert.show(
-                  context,
-                  message: 'Chat History Cleared',
-                  icon: Icons.delete_sweep_rounded,
-                  iconColor: const Color(0xFFDC2626),
-                );
+              try {
+                await _chatService.clearChatHistoryForMe(chatId: _chatId, userUid: _currentUid);
+                if (mounted) {
+                  CenterAlert.show(
+                    context,
+                    message: 'Chat History Cleared',
+                    icon: Icons.delete_sweep_rounded,
+                    iconColor: const Color(0xFFDC2626),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Could not clear chat: $e')),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(
@@ -529,7 +540,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen>
                         color: const Color(0xFF0F172A),
                       ),
                       showSubtitle: true,
-                      fallbackSubtitle: isOnline ? 'Online' : 'Sanchat User',
+                      fallbackSubtitle: handle.isNotEmpty
+                          ? (handle.startsWith('@') ? handle : '@$handle')
+                          : (isOnline ? 'Online' : 'Sanchat User'),
                     ),
                   ),
 

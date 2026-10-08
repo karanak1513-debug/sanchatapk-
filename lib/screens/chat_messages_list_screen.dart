@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +40,9 @@ class _ChatMessagesListScreenState extends State<ChatMessagesListScreen> {
     super.initState();
     _currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
     _chatService.syncCurrentUserProfile();
+    if (_currentUid.isNotEmpty) {
+      unawaited(_chatService.migrateLegacyDuplicateChats(_currentUid));
+    }
     _searchController.addListener(() {
       setState(() {
         _searchFilter = _searchController.text.trim().toLowerCase();
@@ -640,7 +644,7 @@ class ChatConversationTile extends StatelessWidget {
           MaterialPageRoute(
             builder: (_) => ChatConversationScreen(
               peerUid: peerUid,
-              chatId: room.chatId,
+              chatId: ChatService.getDeterministicChatId(currentUid, peerUid),
             ),
           ),
         );
@@ -720,15 +724,70 @@ class ChatConversationTile extends StatelessWidget {
   }
 }
 
-/// Dynamic State Button in Discovery Modal
-class _UserDiscoveryModal extends StatelessWidget {
+/// Dynamic State Button in Discovery Modal with full user search support (Bug 4)
+class _UserDiscoveryModal extends StatefulWidget {
   final String currentUid;
   const _UserDiscoveryModal({required this.currentUid});
 
   @override
+  State<_UserDiscoveryModal> createState() => _UserDiscoveryModalState();
+}
+
+class _UserDiscoveryModalState extends State<_UserDiscoveryModal> {
+  final TextEditingController _searchController = TextEditingController();
+  final ChatService _chatService = ChatService();
+  Timer? _debounceTimer;
+  List<ChatUser> _searchResults = [];
+  bool _isLoading = false;
+  bool _hasSearched = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text.trim();
+    _debounceTimer?.cancel();
+    if (query.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _searchResults = [];
+          _isLoading = false;
+          _hasSearched = false;
+        });
+      }
+      return;
+    }
+
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () async {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = true;
+        _hasSearched = true;
+      });
+      final results = await _chatService.searchUsers(query);
+      if (mounted) {
+        setState(() {
+          _searchResults = results;
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.78,
+      height: MediaQuery.of(context).size.height * 0.82,
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -765,173 +824,258 @@ class _UserDiscoveryModal extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 10),
+          // Search input supporting @handle, displayName, and UID
+          Container(
+            height: 44,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Icon(Icons.search_rounded, size: 18, color: Color(0xFF64748B)),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF0F172A)),
+                    decoration: const InputDecoration(
+                      hintText: 'Search by @handle, name, or UID...',
+                      hintStyle: TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8)),
+                      border: InputBorder.none,
+                      isDense: true,
+                    ),
+                  ),
+                ),
+                if (_searchController.text.isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 16, color: Color(0xFF94A3B8)),
+                    onPressed: () => _searchController.clear(),
+                  ),
+              ],
+            ),
+          ),
           const SizedBox(height: 12),
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: AuthService.firestoreInstance.collection('public_profiles').snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator(color: Color(0xFF0F172A)));
-                }
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator(color: Color(0xFF0F172A), strokeWidth: 2))
+                : _hasSearched
+                    ? _buildSearchResults()
+                    : _buildDefaultUsersList(),
+          ),
+        ],
+      ),
+    );
+  }
 
-                // Strictly exclude the currently logged-in user:
-                final currentUser = FirebaseAuth.instance.currentUser;
-                final myUid = currentUser?.uid ?? currentUid;
-                final myEmail = currentUser?.email?.toLowerCase().trim() ?? '';
-                final users = snapshot.data!.docs.where((doc) {
-                  final d = doc.data() as Map<String, dynamic>;
-                  final uUid = (d['uid'] ?? doc.id).toString();
-                  final uEmail = (d['email'] ?? '').toString().toLowerCase().trim();
-                  if (myUid.isNotEmpty && (doc.id == myUid || uUid == myUid)) return false;
-                  if (myEmail.isNotEmpty && uEmail == myEmail) return false;
-                  return true;
-                }).toList();
+  Widget _buildSearchResults() {
+    if (_searchResults.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.person_off_outlined, size: 36, color: Color(0xFF94A3B8)),
+            const SizedBox(height: 8),
+            Text(
+              'No users found matching query',
+              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B)),
+            ),
+          ],
+        ),
+      );
+    }
 
-                if (users.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'No other registered users found.',
-                      style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B)),
+    return ListView.separated(
+      itemCount: _searchResults.length,
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        final targetUser = _searchResults[index];
+        return _buildUserTile(
+          uid: targetUser.uid,
+          displayName: targetUser.displayName,
+          handle: targetUser.username,
+        );
+      },
+    );
+  }
+
+  Widget _buildDefaultUsersList() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: AuthService.firestoreInstance.collection('public_profiles').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator(color: Color(0xFF0F172A)));
+        }
+
+        final currentUser = FirebaseAuth.instance.currentUser;
+        final myUid = currentUser?.uid ?? widget.currentUid;
+        final myEmail = currentUser?.email?.toLowerCase().trim() ?? '';
+        final users = snapshot.data!.docs.where((doc) {
+          final d = doc.data() as Map<String, dynamic>;
+          final uUid = (d['uid'] ?? doc.id).toString();
+          final uEmail = (d['email'] ?? '').toString().toLowerCase().trim();
+          if (myUid.isNotEmpty && (doc.id == myUid || uUid == myUid)) return false;
+          if (myEmail.isNotEmpty && uEmail == myEmail) return false;
+          return true;
+        }).toList();
+
+        if (users.isEmpty) {
+          return Center(
+            child: Text(
+              'No other registered users found.',
+              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B)),
+            ),
+          );
+        }
+
+        return ListView.separated(
+          itemCount: users.length,
+          separatorBuilder: (_, _) => const SizedBox(height: 10),
+          itemBuilder: (context, index) {
+            final targetUser = users[index];
+            final data = targetUser.data() as Map<String, dynamic>;
+            final targetName = (data['displayName'] != null &&
+                    data['displayName'].toString().trim().isNotEmpty &&
+                    !data['displayName'].toString().startsWith('User '))
+                ? data['displayName'].toString()
+                : (data['handle'] != null ? '@${data['handle']}' : 'Sanchat User');
+            final targetHandle = (data['handle'] ?? 'user').toString();
+
+            return _buildUserTile(
+              uid: targetUser.id,
+              displayName: targetName,
+              handle: targetHandle,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildUserTile({
+    required String uid,
+    required String displayName,
+    required String handle,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: UserAvatarTile(
+              peerUid: uid,
+              radius: 20,
+              showSubtitle: true,
+            ),
+          ),
+          const SizedBox(width: 8),
+          StreamBuilder<String?>(
+            stream: FriendService().getFriendshipStatusStream(uid, widget.currentUid),
+            builder: (context, statusSnap) {
+              final status = statusSnap.data;
+
+              if (status == 'outgoing_pending') {
+                return OutlinedButton(
+                  onPressed: null,
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFFFCD34D)),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text(
+                    "⏳ Waiting for Response",
+                    style: TextStyle(
+                      color: Color(0xFFD97706),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
                     ),
-                  );
-                }
+                  ),
+                );
+              }
 
-                return ListView.separated(
-                  itemCount: users.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final targetUser = users[index];
-                    final data = targetUser.data() as Map<String, dynamic>;
-                    final targetName = (data['displayName'] != null &&
-                            data['displayName'].toString().trim().isNotEmpty &&
-                            !data['displayName'].toString().startsWith('User '))
-                        ? data['displayName'].toString()
-                        : (data['handle'] != null ? '@${data['handle']}' : 'Sanchat User');
-                    final targetHandle = (data['handle'] ?? 'user').toString();
+              if (status == 'incoming_pending') {
+                return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF10B981),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () async {
+                    try {
+                      await FriendService.acceptFriendRequest('${uid}_${widget.currentUid}', uid, widget.currentUid);
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Could not accept: $e')),
+                        );
+                      }
+                    }
+                  },
+                  child: const Text("✓ Accept", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                );
+              }
 
-                    return Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: UserAvatarTile(
-                              peerUid: targetUser.id,
-                              radius: 20,
-                              showSubtitle: true,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          // Dynamic State Button bound to Firestore friend_requests:
-                          StreamBuilder<String?>(
-                            stream: FriendService().getFriendshipStatusStream(targetUser.id, currentUid),
-                            builder: (context, statusSnap) {
-                              final status = statusSnap.data;
-
-                              if (status == 'outgoing_pending') {
-                                return OutlinedButton(
-                                  onPressed: null,
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: Color(0xFFFCD34D)),
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  child: const Text(
-                                    "⏳ Waiting for Response",
-                                    style: TextStyle(
-                                      color: Color(0xFFD97706),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              if (status == 'incoming_pending') {
-                                return ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF10B981),
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  onPressed: () async {
-                                    try {
-                                      await FriendService.acceptFriendRequest('${targetUser.id}_$currentUid', targetUser.id, currentUid);
-                                    } catch (e) {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Could not accept: $e')),
-                                        );
-                                      }
-                                    }
-                                  },
-                                  child: const Text("✓ Accept", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                );
-                              }
-
-                              if (status == 'accepted') {
-                                return ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF10B981),
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => ChatConversationScreen(
-                                          peerUid: targetUser.id,
-                                          peerName: targetName,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: const Text("💬 Chat Now", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                );
-                              }
-
-                              return ElevatedButton.icon(
-                                icon: const Icon(Icons.person_add, size: 16),
-                                label: const Text("Add Friend", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF0F172A),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
-                                onPressed: () async {
-                                  try {
-                                    await FriendService.sendFriendRequest(
-                                      targetUid: targetUser.id,
-                                      targetName: targetName,
-                                      targetHandle: targetHandle,
-                                    );
-                                  } catch (e) {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('$e')),
-                                      );
-                                    }
-                                  }
-                                },
-                              );
-                            },
-                          ),
-                        ],
+              if (status == 'accepted') {
+                return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF10B981),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatConversationScreen(
+                          peerUid: uid,
+                          peerName: displayName,
+                          chatId: ChatService.getDeterministicChatId(widget.currentUid, uid),
+                        ),
                       ),
                     );
                   },
+                  child: const Text("💬 Chat Now", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 );
-              },
-            ),
+              }
+
+              return ElevatedButton.icon(
+                icon: const Icon(Icons.person_add, size: 16),
+                label: const Text("Add Friend", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0F172A),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () async {
+                  try {
+                    await FriendService.sendFriendRequest(
+                      targetUid: uid,
+                      targetName: displayName,
+                      targetHandle: handle,
+                    );
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('$e')),
+                      );
+                    }
+                  }
+                },
+              );
+            },
           ),
         ],
       ),

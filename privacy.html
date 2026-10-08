@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Sanchay Wealth</title>
+  <meta name="description" content="Sanchay Privacy Policy: On-device parsing, AES-256 encryption, zero credential transmission, and strict data sovereignty.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #F8FAFC;
+      --bg-surface: #FFFFFF;
+      --card-border: #E2E8F0;
+      --emerald: #059669;
+      --emerald-subtle: #ECFDF5;
+      --emerald-border: #A7F3D0;
+      --text-main: #0F172A;
+      --text-muted: #475569;
+      --text-dim: #94A3B8;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+      --shadow-float: 0 20px 40px -15px rgba(15, 23, 42, 0.07);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.65;
+      padding: 0 20px 80px;
+      overflow-x: hidden;
+    }
+    .header-bar {
+      max-width: 900px;
+      margin: 24px auto 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      background: #FFFFFF;
+      border: 1px solid var(--card-border);
+      border-radius: 9999px;
+      box-shadow: var(--shadow-sm);
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .brand-logo-sq {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #FFFFFF;
+      font-size: 15px;
+    }
+    .nav-btn {
+      padding: 8px 18px;
+      background: var(--bg-canvas);
+      color: var(--emerald);
+      border: 1px solid var(--emerald-border);
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .nav-btn:hover {
+      background: var(--emerald);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--emerald-subtle);
+      border: 1px solid var(--emerald-border);
+      border-radius: 9999px;
+      color: var(--emerald);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+    .last-updated {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      font-family: var(--font-mono);
+    }
+    .policy-card {
+      background: #FFFFFF;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .policy-card h2 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .policy-card h2::before {
+      content: "";
+      width: 4px;
+      height: 18px;
+      background: var(--emerald);
+      border-radius: 2px;
+    }
+    .policy-card p {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .policy-card p:last-child { margin-bottom: 0; }
+    .policy-card ul {
+      margin: 12px 0 12px 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .policy-card li { margin-bottom: 6px; }
+    .highlight-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-main);
+    }
+    .footer-note {
+      text-align: center;
+      margin-top: 48px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <header class="header-bar">
+    <a href="/" class="brand-group">
+      <div class="brand-logo-sq" style="background: #0F172A; position: relative;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </div>
+      <span>SANCHAT</span>
+    </a>
+    <a href="/" class="nav-btn">← Back to Showcase</a>
+  </header>
+
+  <main class="container">
+    <div class="badge">SECURE DATA ARCHITECTURE</div>
+    <h1>Privacy Policy & Data Sovereignty</h1>
+    <div class="last-updated">Last Updated: October 8, 2026 • Autonomous Self-Discipline Protocol</div>
+
+    <article class="policy-card">
+      <h2>1. Autonomous On-Device Parsing (UPI & Bank SMS)</h2>
+      <p>Sanchay utilizes an on-device Android <span class="highlight-pill">NotificationListenerService</span> and local regex state machine to detect financial debits and credits from payment applications (including Google Pay, PhonePe, Paytm, BHIM) and bank transactional SMS messages.</p>
+      <p><strong>Crucial Guarantee:</strong> All SMS and notification text parsing occurs strictly <em>locally on your mobile device</em>. Raw SMS contents, bank OTPs, personal messages, and personal identity credentials never leave your local hardware environment.</p>
+    </article>
+
+    <article class="policy-card">
+      <h2>2. Zero Personal Credential Transmission</h2>
+      <p>Sanchay <strong>never</strong> asks for, captures, logs, or transmits:</p>
+      <ul>
+        <li>Your Bank Account Logins, Passwords, or NetBanking Credentials.</li>
+        <li>Your UPI PIN, ATM PIN, or Debit/Credit Card CVV numbers.</li>
+        <li>One-Time Passwords (OTPs) or Two-Factor Authentication codes.</li>
+      </ul>
+      <p>Sanchay is an informational expense ledger and behavioral pacing tool. It is not connected via account aggregator banking APIs and does not hold custody of your funds.</p>
+    </article>
+
+    <article class="policy-card">
+      <h2>3. AES-256 On-Device Storage & Local Data Sovereignty</h2>
+      <p>All transacted amounts, merchant metadata, and category tags are saved into your private local SQLite database on your device and synchronized strictly with your authenticated Google Firebase account via TLS 1.3 encryption.</p>
+      <p>You maintain 100% data sovereignty. At any point, you can:</p>
+      <ul>
+        <li>Export your entire transaction ledger into standard RFC 4180 Excel CSV format.</li>
+        <li>Generate an AES-256 encrypted JSON backup file for cold offline storage.</li>
+        <li>Execute a single-tap <strong>Purge All Data</strong> command which permanently deletes all records from local storage and cloud database.</li>
+      </ul>
+    </article>
+
+    <article class="policy-card">
+      <h2>4. Zero Third-Party Advertising & Zero Data Selling</h2>
+      <p>We believe financial intelligence must remain completely private. Sanchay will <strong>never</strong> sell, rent, monetize, or broker your financial transactions or shopping habits to ad networks, insurance providers, credit score companies, or data brokers.</p>
+    </article>
+
+    <article class="policy-card">
+      <h2>5. Sanchay Connect & Friend Network Privacy</h2>
+      <p>When using <em>Sanchay Connect</em> to chat with peers or coordinate shared goal pacing:</p>
+      <ul>
+        <li>You only connect with users whom you explicitly accept via bidirectional friend requests.</li>
+        <li>You may block any user at any time, instantly preventing discovery and messaging.</li>
+        <li>The <strong>Delete for Everyone</strong> feature physically erases the message document from the secure cloud thread.</li>
+      </ul>
+    </article>
+
+    <article class="policy-card">
+      <h2>6. Contact & Data Protection Officer</h2>
+      <p>For inquiries, audits, or immediate data purge requests, contact our engineering team directly at:</p>
+      <p style="color: var(--emerald); font-family: var(--font-mono); font-weight: 700;">privacy@sanchay.app</p>
+    </article>
+
+    <div class="footer-note">
+      © 2026 Sanchay Wealth (Package: com.aistudio.sanchay.savtrkr). All rights reserved.
+    </div>
+  </main>
+</body>
+</html>

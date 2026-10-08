@@ -27,6 +27,7 @@ import '../widgets/spending_trend_chart.dart';
 import '../widgets/brand_logo.dart';
 import 'chat_messages_list_screen.dart';
 import 'app_guide_screen.dart';
+import 'gamification_hub_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final VoidCallback? onOpenSettings;
@@ -423,6 +424,42 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                 SizedBox(width: 4),
                                 Text(
                                   'Guide',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.obsidian,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        // Gamification & Pet Hub Pill
+                        _TactileBounce(
+                          onTap: () => GamificationHubScreen.show(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(color: Colors.black.withOpacity(0.08)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.obsidian.withOpacity(0.03),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Text('🐣', style: TextStyle(fontSize: 12)),
+                                SizedBox(width: 3),
+                                Text(
+                                  'Hub',
                                   style: TextStyle(
                                     fontFamily: 'Inter',
                                     fontSize: 11,

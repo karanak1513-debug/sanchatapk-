@@ -1,0 +1,28 @@
+# Ignore duplicate APKs at root (leading slash matches root only)
+/sanchat-release.apk
+/sanchay-release.apk
+/downloads/
+/web/downloads/
+
+# Ignore heavy native SDK & Flutter build directories
+build/
+android/
+ios/
+linux/
+macos/
+.dart_tool/
+.gradle/
+.git/
+test/
+.idea/
+.vscode/
+.firebase/
+*.bat
+*.ps1
+*.sh
+adapters/
+.agent/
+.agents/
+.gemini/
+.gsd/
+.windows_backup/

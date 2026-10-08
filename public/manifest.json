@@ -1,0 +1,22 @@
+{
+  "name": "Sanchat — Smart Personal Wealth & Vault Cockpit",
+  "short_name": "Sanchat",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#10B981",
+  "description": "Intelligent personal finance and wealth management app with autonomous UPI tracking and savings vaults.",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/branding/sanchat_icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/branding/sanchat_icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -31,12 +31,14 @@ class ChatService {
 
   /// Composite deterministic Chat ID:
   /// Always sorts uids alphabetically to guarantee 1-on-1 consistency
-  String getChatId(String a, String b) {
+  static String getDeterministicChatId(String a, String b) {
     if (a.isEmpty && b.isEmpty) return 'unknown_chat';
     if (a.isEmpty) return b;
     if (b.isEmpty) return a;
     return a.compareTo(b) < 0 ? '${a}_$b' : '${b}_$a';
   }
+
+  String getChatId(String a, String b) => getDeterministicChatId(a, b);
 
   /// Normalize a username into a lowercase, alphanumeric handle
   static String normalizeUsername(String input) {
@@ -249,7 +251,7 @@ class ChatService {
     controller.add(combined);
   }
 
-  /// 5. Stream active chats for the current user
+  /// 5. Stream active chats for the current user (deduplicated by peer UID)
   Stream<List<ChatRoom>> getUserChatsStream([String? userUid]) {
     final myUid = userUid ?? currentUid;
     if (myUid.isEmpty) return Stream.value([]);
@@ -259,7 +261,30 @@ class ChatService {
         .where('participants', arrayContains: myUid)
         .orderBy('lastTimestamp', descending: true)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => ChatRoom.fromFirestore(doc)).toList());
+        .map((snap) {
+          final rawRooms = snap.docs.map((doc) => ChatRoom.fromFirestore(doc)).toList();
+          final Map<String, ChatRoom> deduplicated = {};
+          for (final room in rawRooms) {
+            final peerUid = room.getPeerUid(myUid);
+            if (peerUid.isEmpty) continue;
+            final canonicalId = getDeterministicChatId(myUid, peerUid);
+            final existing = deduplicated[peerUid];
+            if (existing == null) {
+              deduplicated[peerUid] = room;
+            } else {
+              // Prefer canonical room ID or the one with newer lastTimestamp
+              if (room.chatId == canonicalId) {
+                deduplicated[peerUid] = room;
+              } else if (existing.chatId != canonicalId &&
+                  room.lastTimestamp.isAfter(existing.lastTimestamp)) {
+                deduplicated[peerUid] = room;
+              }
+            }
+          }
+          final list = deduplicated.values.toList();
+          list.sort((a, b) => b.lastTimestamp.compareTo(a.lastTimestamp));
+          return list;
+        });
   }
 
   /// Dynamic Total Unread Count Stream for Top-Level App Bar Badging
@@ -276,19 +301,20 @@ class ChatService {
     });
   }
 
-  /// 6. Fast Debounced User Search Engine
+  /// 6. Fast Debounced User Search Engine (Bug 4 Implementation)
   /// Supports:
-  /// - Exact match query on public_profiles document ID (doc(rawQuery))
-  /// - Handle match on public_profiles (where handle == rawQuery.toLowerCase())
-  /// - Prefix search on public_profiles
-  /// - Fallback to users collection
-  /// - Excludes currently authenticated user from results
+  /// - Display Name search (displayName_lowercase prefix query)
+  /// - @handle search (handle_lowercase prefix query)
+  /// - Exact UID direct lookup
+  /// - Result deduplication: merged results shown exactly once
   Future<List<ChatUser>> searchUsers(String rawQuery) async {
     final myUid = currentUid;
     final cleanInput = rawQuery.trim();
-    var query = cleanInput.toLowerCase();
-    if (query.startsWith('@')) query = query.substring(1);
-    final results = <ChatUser>[];
+    final normalizedQuery = cleanInput.toLowerCase();
+    var handleQuery = normalizedQuery;
+    if (handleQuery.startsWith('@')) handleQuery = handleQuery.substring(1);
+
+    final Map<String, ChatUser> resultsMap = {};
 
     try {
       // A. Empty Query: Fetch most recently active users from public_profiles
@@ -297,11 +323,11 @@ class ChatService {
           final snapshot = await _db.collection('public_profiles').limit(20).get();
           for (var doc in snapshot.docs) {
             if (doc.id == myUid) continue;
-            results.add(ChatUser.fromMap(doc.data(), doc.id));
+            resultsMap[doc.id] = ChatUser.fromMap(doc.data(), doc.id);
           }
         } catch (_) {}
 
-        if (results.isEmpty) {
+        if (resultsMap.isEmpty) {
           final snapshot = await _db
               .collection('users')
               .orderBy('lastSeen', descending: true)
@@ -311,80 +337,116 @@ class ChatService {
 
           for (var doc in snapshot.docs) {
             if (doc.id == myUid) continue;
-            results.add(ChatUser.fromFirestore(doc));
+            resultsMap[doc.id] = ChatUser.fromFirestore(doc);
           }
         }
-        return results;
+        return resultsMap.values.toList();
       }
 
-      // B. Exact match on public_profiles document ID (doc(rawQuery))
+      // 1. UID FALLBACK & EXACT DOCUMENT LOOKUP
+      // If query is an exact doc ID / UID
       try {
-        final exactDoc = await _db.collection('public_profiles').doc(cleanInput).get();
-        if (exactDoc.exists && exactDoc.id != myUid) {
-          results.add(ChatUser.fromMap(exactDoc.data()!, exactDoc.id));
-          return results;
+        final docSnap = await _db.collection('public_profiles').doc(cleanInput).get();
+        if (docSnap.exists && docSnap.id != myUid) {
+          resultsMap[docSnap.id] = ChatUser.fromMap(docSnap.data()!, docSnap.id);
         }
       } catch (_) {}
 
-      if (query != cleanInput) {
+      try {
+        final uidMatch = await _db
+            .collection('public_profiles')
+            .where('uid', isEqualTo: cleanInput)
+            .limit(5)
+            .get();
+        for (var doc in uidMatch.docs) {
+          if (doc.id != myUid) {
+            resultsMap[doc.id] = ChatUser.fromMap(doc.data(), doc.id);
+          }
+        }
+      } catch (_) {}
+
+      // 2. HANDLE SEARCH (using handle_lowercase prefix range query)
+      if (handleQuery.isNotEmpty) {
         try {
-          final exactDoc = await _db.collection('public_profiles').doc(query).get();
-          if (exactDoc.exists && exactDoc.id != myUid) {
-            results.add(ChatUser.fromMap(exactDoc.data()!, exactDoc.id));
-            return results;
+          final handleLowerSnap = await _db
+              .collection('public_profiles')
+              .where('handle_lowercase', isGreaterThanOrEqualTo: handleQuery)
+              .where('handle_lowercase', isLessThanOrEqualTo: '$handleQuery\uf8ff')
+              .limit(20)
+              .get();
+          for (var doc in handleLowerSnap.docs) {
+            if (doc.id != myUid) {
+              resultsMap[doc.id] = ChatUser.fromMap(doc.data(), doc.id);
+            }
           }
         } catch (_) {}
-      }
 
-      // C. Query collection('public_profiles').where('handle', isEqualTo: rawQuery.toLowerCase()).get()
-      try {
-        final handleQuery = await _db
-            .collection('public_profiles')
-            .where('handle', isEqualTo: query)
-            .get();
-        for (var doc in handleQuery.docs) {
-          if (doc.id == myUid) continue;
-          if (!results.any((u) => u.uid == doc.id)) {
-            results.add(ChatUser.fromMap(doc.data(), doc.id));
-          }
-        }
-      } catch (_) {}
-
-      // D. Prefix search on public_profiles handle
-      if (results.isEmpty && query.isNotEmpty) {
+        // Fallback on legacy 'handle' field
         try {
-          final prefixQuery = await _db
+          final handleSnap = await _db
               .collection('public_profiles')
-              .where('handle', isGreaterThanOrEqualTo: query)
-              .where('handle', isLessThanOrEqualTo: '$query\uf8ff')
+              .where('handle', isGreaterThanOrEqualTo: handleQuery)
+              .where('handle', isLessThanOrEqualTo: '$handleQuery\uf8ff')
               .limit(10)
               .get();
-          for (var doc in prefixQuery.docs) {
-            if (doc.id == myUid) continue;
-            if (!results.any((u) => u.uid == doc.id)) {
-              results.add(ChatUser.fromMap(doc.data(), doc.id));
+          for (var doc in handleSnap.docs) {
+            if (doc.id != myUid) {
+              resultsMap.putIfAbsent(doc.id, () => ChatUser.fromMap(doc.data(), doc.id));
             }
           }
         } catch (_) {}
       }
 
-      // E. Fallback search against users collection
-      if (results.isEmpty) {
+      // 3. DISPLAY NAME SEARCH (using displayName_lowercase prefix range query)
+      if (normalizedQuery.isNotEmpty) {
         try {
-          final uidDoc = await _db.collection('users').doc(cleanInput).get();
-          if (uidDoc.exists && uidDoc.id != myUid) {
-            results.add(ChatUser.fromFirestore(uidDoc));
-            return results;
-          }
-
-          final usernameQuery = await _db
-              .collection('users')
-              .where('username', isEqualTo: query)
+          final nameLowerSnap = await _db
+              .collection('public_profiles')
+              .where('displayName_lowercase', isGreaterThanOrEqualTo: normalizedQuery)
+              .where('displayName_lowercase', isLessThanOrEqualTo: '$normalizedQuery\uf8ff')
+              .limit(20)
               .get();
-          for (var doc in usernameQuery.docs) {
-            if (doc.id == myUid) continue;
-            if (!results.any((u) => u.uid == doc.id)) {
-              results.add(ChatUser.fromFirestore(doc));
+          for (var doc in nameLowerSnap.docs) {
+            if (doc.id != myUid) {
+              resultsMap.putIfAbsent(doc.id, () => ChatUser.fromMap(doc.data(), doc.id));
+            }
+          }
+        } catch (_) {}
+
+        // Fallback on legacy 'displayName'
+        try {
+          final nameSnap = await _db
+              .collection('public_profiles')
+              .where('displayName', isGreaterThanOrEqualTo: cleanInput)
+              .where('displayName', isLessThanOrEqualTo: '$cleanInput\uf8ff')
+              .limit(10)
+              .get();
+          for (var doc in nameSnap.docs) {
+            if (doc.id != myUid) {
+              resultsMap.putIfAbsent(doc.id, () => ChatUser.fromMap(doc.data(), doc.id));
+            }
+          }
+        } catch (_) {}
+      }
+
+      // 4. Fallback search against users collection if still empty
+      if (resultsMap.isEmpty) {
+        try {
+          final userDoc = await _db.collection('users').doc(cleanInput).get();
+          if (userDoc.exists && userDoc.id != myUid) {
+            resultsMap[userDoc.id] = ChatUser.fromFirestore(userDoc);
+          }
+        } catch (_) {}
+
+        try {
+          final usernameSnap = await _db
+              .collection('users')
+              .where('username', isEqualTo: handleQuery)
+              .limit(10)
+              .get();
+          for (var doc in usernameSnap.docs) {
+            if (doc.id != myUid) {
+              resultsMap.putIfAbsent(doc.id, () => ChatUser.fromFirestore(doc));
             }
           }
         } catch (_) {}
@@ -393,7 +455,7 @@ class ChatService {
       debugPrint('Error searching users in Firestore: $e');
     }
 
-    return results;
+    return resultsMap.values.toList();
   }
 
   // =========================================================================
@@ -781,7 +843,43 @@ class ChatService {
     }
   }
 
-  /// Backward-compatible wrapper calling clearEntireChatHistory
+  /// Per-user history clearing ("Clear for Me")
+  Future<void> clearChatHistoryForMe({
+    required String chatId,
+    required String userUid,
+  }) async {
+    if (chatId.isEmpty || userUid.isEmpty) return;
+    try {
+      final messagesRef = _db
+          .collection('chats')
+          .doc(chatId)
+          .collection('messages');
+
+      final snapshots = await messagesRef.limit(400).get();
+      final batch = _db.batch();
+      for (final doc in snapshots.docs) {
+        batch.update(doc.reference, {
+          'clearedBy': FieldValue.arrayUnion([userUid]),
+          'deletedForUids': FieldValue.arrayUnion([userUid]),
+        });
+      }
+      await batch.commit();
+
+      final list = _lastFirestoreMessages[chatId];
+      if (list != null) {
+        _lastFirestoreMessages[chatId] = list
+            .where((m) => !m.clearedBy.contains(userUid) && !m.deletedForUids.contains(userUid))
+            .toList();
+      }
+      _optimisticBuffer[chatId]?.clear();
+      _emitCombinedMessages(chatId);
+    } catch (e) {
+      debugPrint('Error clearing chat history for user: $e');
+      rethrow;
+    }
+  }
+
+  /// Backward-compatible wrapper calling clearChatHistoryForMe
   Future<void> clearChatHistory({
     String? peerUid,
     String? chatId,
@@ -790,8 +888,60 @@ class ChatService {
     final effectiveChatId = (chatId != null && chatId.isNotEmpty)
         ? chatId
         : getChatId(userUid ?? currentUid, peerUid ?? '');
+    final effectiveUid = userUid ?? currentUid;
 
-    await clearEntireChatHistory(effectiveChatId);
+    await clearChatHistoryForMe(chatId: effectiveChatId, userUid: effectiveUid);
+  }
+
+  /// Safe migration utility for existing duplicate conversations belonging to the same two users
+  Future<void> migrateLegacyDuplicateChats([String? userUid]) async {
+    final myUid = userUid ?? currentUid;
+    if (myUid.isEmpty) return;
+
+    try {
+      final snap = await _db
+          .collection('chats')
+          .where('participants', arrayContains: myUid)
+          .get();
+
+      final Map<String, List<DocumentSnapshot>> roomsByPeer = {};
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        final participants = (data['participants'] as List?)?.map((e) => e.toString()).toList() ?? [];
+        final peer = participants.firstWhere((p) => p != myUid, orElse: () => '');
+        if (peer.isNotEmpty) {
+          roomsByPeer.putIfAbsent(peer, () => []).add(doc);
+        }
+      }
+
+      for (final entry in roomsByPeer.entries) {
+        final peerUid = entry.key;
+        final docs = entry.value;
+        if (docs.length > 1) {
+          final canonicalId = getDeterministicChatId(myUid, peerUid);
+          final canonicalRef = _db.collection('chats').doc(canonicalId);
+
+          for (final oldDoc in docs) {
+            if (oldDoc.id != canonicalId) {
+              final msgsSnap = await oldDoc.reference.collection('messages').get();
+              for (final msgDoc in msgsSnap.docs) {
+                final targetMsgRef = canonicalRef.collection('messages').doc(msgDoc.id);
+                final exists = (await targetMsgRef.get()).exists;
+                if (!exists) {
+                  await targetMsgRef.set(msgDoc.data());
+                }
+              }
+              await oldDoc.reference.set({
+                'isObsolete': true,
+                'migratedTo': canonicalId,
+              }, SetOptions(merge: true));
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error migrating duplicate chats: $e');
+    }
   }
 
   /// Hard-delete the parent chats/{chatId} document and purge subcollection messages
@@ -920,13 +1070,27 @@ class ChatService {
         'uid': user.uid,
         'userId': user.uid,
         'displayName': effectiveName,
+        'displayName_lowercase': effectiveName.trim().toLowerCase(),
         'name': effectiveName,
         'username': username,
+        'handle': username,
+        'handle_lowercase': username.trim().toLowerCase(),
         'email': effectiveEmail,
         'avatarUrl': effectiveAvatar,
         'photoUrl': effectiveAvatar,
         'lastSeen': FieldValue.serverTimestamp(),
         'lastActive': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      await _db.collection('public_profiles').doc(user.uid).set({
+        'uid': user.uid,
+        'displayName': effectiveName,
+        'displayName_lowercase': effectiveName.trim().toLowerCase(),
+        'handle': username,
+        'handle_lowercase': username.trim().toLowerCase(),
+        'avatarUrl': effectiveAvatar,
+        'isVerified': true,
+        'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
     } catch (e) {
       debugPrint('Error syncing user profile in users collection: $e');

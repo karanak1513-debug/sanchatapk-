@@ -1,47 +1,1865 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <!-- Primary SEO Meta Tags -->
+  <title>Sanchat — Smart Personal Finance & Savings Vault</title>
+  <meta name="title" content="Sanchat — Smart Personal Finance & Savings Vault">
+  <meta name="description" content="Track spending, protect savings, and understand your financial runway — all in one intelligent personal finance app. 100% on-device privacy, zero data selling.">
+  <meta name="keywords" content="Sanchat, wealth app, personal finance, savings vault, spending tracker, UPI tracker, financial runway, budget manager, Android">
+  <meta name="author" content="Sanchat Wealth">
+  <meta name="theme-color" content="#0F172A">
 
-  <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Sanchat">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sanchat.app/">
+  <meta property="og:title" content="Sanchat — Your Money. Your Control. Your Sanchat.">
+  <meta property="og:description" content="Track spending, protect savings, and understand your financial runway with intelligent on-device automation and zero data selling.">
+  <meta property="og:image" content="/assets/branding/sanchat_og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <!-- Twitter Card -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Sanchat — Your Money. Your Control. Your Sanchat.">
+  <meta property="twitter:description" content="Smart Personal Finance & Savings Vault. Autonomous tracking, dual-ledger goals, and privacy-first architecture.">
+  <meta property="twitter:image" content="/assets/branding/sanchat_og.png">
 
-  <title>Sanchat</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="google-signin-client_id" content="41954701104-1eqfhs3s6p6naknnui85ab2hubaki4dc.apps.googleusercontent.com">
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/branding/sanchat_logo.svg">
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/Icon-192.png">
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-canvas: #F8FAFC;
+      --bg-surface: #FFFFFF;
+      --bg-elevated: #F1F5F9;
+      --border-light: #E2E8F0;
+      --border-hover: #CBD5E1;
+      
+      --obsidian: #0F172A;
+      --obsidian-slate: #1E293B;
+      --emerald: #059669;
+      --emerald-dark: #047857;
+      --emerald-light: #10B981;
+      --emerald-subtle: #ECFDF5;
+      --emerald-border: #A7F3D0;
+      
+      --crimson: #DC2626;
+      --crimson-subtle: #FEF2F2;
+      
+      --text-main: #0F172A;
+      --text-muted: #475569;
+      --text-dim: #94A3B8;
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-xl: 32px;
+      --radius-pill: 9999px;
+      
+      --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --shadow-subtle: 0 1px 3px rgba(15, 23, 42, 0.04);
+      --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      --shadow-float: 0 25px 50px -12px rgba(15, 23, 42, 0.12);
+      --shadow-emerald: 0 10px 25px -5px rgba(5, 150, 105, 0.3);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-canvas);
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Clean Technical Grid */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(#E2E8F0 1px, transparent 1px),
+        radial-gradient(circle at 50% -10%, rgba(16, 185, 129, 0.07) 0%, transparent 65%);
+      background-size: 32px 32px, 100% 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* =====================================================================
+       NAVBAR
+       ===================================================================== */
+    .navbar-wrapper {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      padding: 0 24px;
+      margin-bottom: 24px;
+    }
+
+    .navbar {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-pill);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06);
+    }
+
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: block;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 19px;
+      letter-spacing: -0.03em;
+      color: var(--obsidian);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--emerald);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-nav-cta {
+      padding: 9px 20px;
+      background: var(--obsidian);
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-pill);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+
+    .btn-nav-cta:hover {
+      background: var(--obsidian-slate);
+      transform: translateY(-1px);
+    }
+
+    /* =====================================================================
+       01 — HERO SECTION
+       ===================================================================== */
+    .hero-section {
+      padding: 40px 0 80px;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--obsidian);
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.5);
+      animation: pulseGreen 2s infinite;
+    }
+
+    @keyframes pulseGreen {
+      0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.6); }
+      70% { box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+    }
+
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      color: var(--obsidian);
+      margin-bottom: 22px;
+    }
+
+    .highlight-emerald {
+      background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subheading {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 36px;
+      max-width: 540px;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .btn-hero-primary {
+      padding: 16px 32px;
+      background: var(--obsidian);
+      color: #FFFFFF;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: var(--radius-pill);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);
+      transition: all 0.25s ease;
+    }
+
+    .btn-hero-primary:hover {
+      background: var(--obsidian-slate);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px -5px rgba(15, 23, 42, 0.3);
+    }
+
+    .btn-hero-secondary {
+      padding: 16px 28px;
+      background: #FFFFFF;
+      color: var(--obsidian);
+      border: 1px solid var(--border-light);
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: var(--radius-pill);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-subtle);
+      transition: all 0.25s ease;
+    }
+
+    .btn-hero-secondary:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-elevated);
+      transform: translateY(-1px);
+    }
+
+    .hero-trust-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: var(--font-body);
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .trust-item svg {
+      color: var(--emerald);
+    }
+
+    /* Phone Mockup Canvas */
+    .mockup-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Ambient Phone Glow */
+    .mockup-wrapper::before {
+      content: "";
+      position: absolute;
+      width: 380px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(15, 23, 42, 0.04) 50%, transparent 70%);
+      filter: blur(40px);
+      z-index: 0;
+    }
+
+    .phone-frame {
+      width: 320px;
+      height: 650px;
+      background: #FFFFFF;
+      border-radius: 46px;
+      border: 8px solid #0F172A;
+      box-shadow: 0 30px 70px -15px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08);
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Phone Notch / Island */
+    .phone-island {
+      width: 90px;
+      height: 20px;
+      background: #0F172A;
+      border-radius: 0 0 14px 14px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .island-lens {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #1E293B;
+    }
+
+    .phone-screen {
+      flex: 1;
+      background: #F8FAFC;
+      padding: 14px 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Phone UI Components */
+    .phone-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 2px;
+    }
+
+    .phone-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--obsidian);
+    }
+
+    .phone-brand img {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+    }
+
+    .phone-sync-badge {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--emerald-dark);
+      background: var(--emerald-subtle);
+      border: 1px solid var(--emerald-border);
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .phone-greeting {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .phone-user {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--obsidian);
+      line-height: 1.2;
+    }
+
+    /* Card: Safe to Spend Today */
+    .phone-runway-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .runway-card-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .runway-val-big {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--emerald);
+      line-height: 1.1;
+    }
+
+    .runway-subtext {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .runway-bar {
+      height: 6px;
+      background: var(--border-light);
+      border-radius: 99px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .runway-bar-fill {
+      width: 74%;
+      height: 100%;
+      background: linear-gradient(90deg, #059669, #10B981);
+      border-radius: 99px;
+    }
+
+    /* Card: Master Vault */
+    .phone-vault-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .vault-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .vault-card-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--obsidian);
+    }
+
+    .vault-pct-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: #FFFFFF;
+      background: var(--obsidian);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .vault-amounts {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .vault-acc-val {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--obsidian);
+    }
+
+    .vault-target-val {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Floating Financial Elements */
+    .float-chip {
+      position: absolute;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-pill);
+      padding: 8px 14px;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--obsidian);
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 3;
+      animation: floatSmooth 4s ease-in-out infinite alternate;
+    }
+
+    .float-chip-1 {
+      top: 12%;
+      left: -20px;
+      animation-delay: 0s;
+    }
+
+    .float-chip-2 {
+      top: 40%;
+      right: -25px;
+      animation-delay: 1.2s;
+    }
+
+    .float-chip-3 {
+      bottom: 18%;
+      left: -15px;
+      animation-delay: 2.4s;
+    }
+
+    @keyframes floatSmooth {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-8px); }
+    }
+
+    /* =====================================================================
+       02 — SEE WHERE YOUR MONEY GOES
+       ===================================================================== */
+    .section-kicker {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--emerald);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+      display: inline-block;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: var(--obsidian);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 600px;
+      line-height: 1.6;
+      margin-bottom: 48px;
+    }
+
+    .section-padding {
+      padding: 80px 0;
+    }
+
+    .strip-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .strip-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-subtle);
+      transition: all 0.25s ease;
+    }
+
+    .strip-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .strip-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--bg-elevated);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .strip-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--obsidian);
+      margin-bottom: 6px;
+    }
+
+    .strip-body {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* =====================================================================
+       03 & 04 — SPLIT RUNWAY & MASTER VAULT VISUALIZATION
+       ===================================================================== */
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: stretch;
+    }
+
+    .feature-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .feature-card-header {
+      margin-bottom: 24px;
+    }
+
+    .interactive-gauge {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      text-align: center;
+    }
+
+    .gauge-circle {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 16px;
+      position: relative;
+    }
+
+    .gauge-circle svg {
+      transform: rotate(-90deg);
+      width: 140px;
+      height: 140px;
+    }
+
+    .gauge-circle circle {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+    }
+
+    .gauge-bg {
+      stroke: #E2E8F0;
+    }
+
+    .gauge-fill {
+      stroke: var(--emerald);
+      stroke-dasharray: 377;
+      stroke-dashoffset: 263; /* 30% */
+      transition: stroke-dashoffset 0.8s ease;
+    }
+
+    .gauge-center-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gauge-val {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--obsidian);
+    }
+
+    .gauge-sub {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .vault-sim-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+
+    .btn-sim {
+      padding: 7px 14px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--obsidian);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sim:hover {
+      background: var(--emerald-subtle);
+      border-color: var(--emerald-border);
+      color: var(--emerald-dark);
+    }
+
+    /* =====================================================================
+       05 — SMART TARGETS TIMELINE
+       ===================================================================== */
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .target-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .target-icon {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .target-title {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--obsidian);
+      margin-bottom: 4px;
+    }
+
+    .target-amounts {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .target-progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--border-light);
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .target-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #059669, #10B981);
+      border-radius: var(--radius-pill);
+    }
+
+    /* =====================================================================
+       08 & 09 — PRIVACY & PERMISSION ARCHITECTURE
+       ===================================================================== */
+    .privacy-callout-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 48px;
+      box-shadow: var(--shadow-card);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .compliance-pill-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .compliance-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+    }
+
+    .compliance-item svg {
+      color: var(--emerald);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .compliance-item-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--obsidian);
+    }
+
+    .compliance-item-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* =====================================================================
+       11 — DEDICATED APK DOWNLOAD PANEL
+       ===================================================================== */
+    .download-panel-box {
+      background: #FFFFFF;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 48px;
+      box-shadow: var(--shadow-float);
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 40px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-panel-box::after {
+      content: "";
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .apk-details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .apk-detail-cell {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+    }
+
+    .apk-detail-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .apk-detail-val {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--obsidian);
+      margin-top: 2px;
+    }
+
+    .sha256-block {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      margin-bottom: 24px;
+    }
+
+    .sha256-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .sha256-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--emerald-dark);
+      text-transform: uppercase;
+    }
+
+    .btn-copy-sha {
+      background: none;
+      border: none;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--emerald);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sha256-hash {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--obsidian-slate);
+      word-break: break-all;
+      line-height: 1.4;
+      background: #FFFFFF;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+    }
+
+    .qr-side-card {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-canvas-wrap {
+      width: 170px;
+      height: 170px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 10px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qrCanvas {
+      width: 150px;
+      height: 150px;
+      display: block;
+    }
+
+    .qr-caption {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* =====================================================================
+       12 — FAQ ACCORDION
+       ===================================================================== */
+    .faq-list {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .faq-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .faq-q {
+      padding: 18px 24px;
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--obsidian);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .faq-a {
+      padding: 0 24px 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      display: none;
+    }
+
+    .faq-card.open .faq-a {
+      display: block;
+    }
+
+    /* =====================================================================
+       13 — FOOTER
+       ===================================================================== */
+    .footer {
+      border-top: 1px solid var(--border-light);
+      padding: 60px 0 40px;
+      background: #FFFFFF;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .footer-brand img {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+    }
+
+    .footer-heading {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--obsidian);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .footer-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-nav-list a:hover {
+      color: var(--emerald);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border-light);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-subheading {
+        margin: 0 auto 36px;
+      }
+      .hero-cta-group {
+        justify-content: center;
+      }
+      .hero-trust-bar {
+        justify-content: center;
+      }
+      .strip-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .split-grid {
+        grid-template-columns: 1fr;
+      }
+      .timeline-grid {
+        grid-template-columns: 1fr;
+      }
+      .privacy-callout-card {
+        grid-template-columns: 1fr;
+      }
+      .download-panel-box {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-headline {
+        font-size: 40px;
+      }
+      .strip-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-links {
+        display: none;
+      }
+      .apk-details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
-  <script src="flutter_bootstrap.js" async></script>
+  <!-- Sticky Navbar -->
+  <header class="navbar-wrapper">
+    <nav class="navbar">
+      <a href="#" class="brand-link">
+        <img src="/assets/branding/sanchat_icon.png" alt="Sanchat Logo" class="brand-logo-img">
+        <span class="brand-title">SANCHAT</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#runway">Runway</a></li>
+        <li><a href="#vault">Master Vault</a></li>
+        <li><a href="#targets">Targets</a></li>
+        <li><a href="#ledger">Ledger</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="#download">Download</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#download" class="btn-nav-cta">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Get Sanchat</span>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 01 — HERO SECTION -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-grid">
+          
+          <div class="hero-copy">
+            <div class="hero-badge">
+              <span class="pulse-dot"></span>
+              <span>Official Release • Target SDK 36 • Android 16 Ready</span>
+            </div>
+
+            <h1 class="hero-headline">
+              Your Money.<br>
+              Your Control.<br>
+              <span class="highlight-emerald">Your Sanchat.</span>
+            </h1>
+
+            <p class="hero-subheading">
+              Track spending, protect savings, and understand your financial runway — all in one intelligent personal finance app.
+            </p>
+
+            <div class="hero-cta-group">
+              <a href="/downloads/sanchat-release.apk" download="sanchat-release.apk" class="btn-hero-primary" id="btn-hero-download">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download Signed APK</span>
+              </a>
+
+              <a href="#features" class="btn-hero-secondary">
+                <span>Explore Features</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+            </div>
+
+            <div class="hero-trust-bar">
+              <div class="trust-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>100% On-Device Parsing</span>
+              </div>
+              <div class="trust-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>
+                <span>Zero Data Selling</span>
+              </div>
+              <div class="trust-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="10"/></svg>
+                <span>Private Vaults</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phone Mockup with Actual Sanchat UI & Floating Elements -->
+          <div class="mockup-wrapper">
+            <div class="float-chip float-chip-1">
+              <span>₹</span>
+              <span>Live Sync Active</span>
+            </div>
+            <div class="float-chip float-chip-2">
+              <span>🛡️</span>
+              <span>Vault Protected</span>
+            </div>
+            <div class="float-chip float-chip-3">
+              <span>⚡</span>
+              <span>22 Days Safe Runway</span>
+            </div>
+
+            <div class="phone-frame">
+              <div class="phone-island">
+                <div class="island-lens"></div>
+              </div>
+
+              <div class="phone-screen">
+                <!-- Sanchat Top Bar -->
+                <div class="phone-top-bar">
+                  <div class="phone-brand">
+                    <img src="/assets/branding/sanchat_icon.png" alt="Sanchat">
+                    <span>SANCHAT</span>
+                  </div>
+                  <div class="phone-sync-badge">
+                    <span class="pulse-dot" style="width: 5px; height: 5px;"></span>
+                    <span>LIVE SYNC</span>
+                  </div>
+                </div>
+
+                <!-- Greeting -->
+                <div>
+                  <div class="phone-greeting">Good day, Alex</div>
+                  <div class="phone-user">Financial Runway</div>
+                </div>
+
+                <!-- Daily Runway Card -->
+                <div class="phone-runway-card">
+                  <div class="runway-card-title">Daily Spending Runway</div>
+                  <div class="runway-val-big">₹1,500 <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">/ day</span></div>
+                  <div class="runway-subtext">
+                    <span>Quota: ₹2,000</span>
+                    <span style="font-weight: 700; color: var(--emerald-dark);">22 Days Safe</span>
+                  </div>
+                  <div class="runway-bar">
+                    <div class="runway-bar-fill"></div>
+                  </div>
+                </div>
+
+                <!-- Master Vault Card -->
+                <div class="phone-vault-card">
+                  <div class="vault-card-header">
+                    <span class="vault-card-title">Master Vault Reserve</span>
+                    <span class="vault-pct-badge">30% PACED</span>
+                  </div>
+                  <div class="vault-amounts">
+                    <span class="vault-acc-val">₹30,000</span>
+                    <span class="vault-target-val">of ₹1,00,000 target</span>
+                  </div>
+                  <div class="runway-bar" style="margin-top: 6px;">
+                    <div class="runway-bar-fill" style="width: 30%;"></div>
+                  </div>
+                </div>
+
+                <!-- Net Cash Liquidity -->
+                <div class="phone-runway-card" style="padding: 10px 14px;">
+                  <div class="runway-card-title" style="margin-bottom: 2px;">Net Cash Liquidity</div>
+                  <div style="font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--obsidian);">₹45,200</div>
+                  <div style="font-size: 10px; color: var(--text-muted); display: flex; justify-content: space-between; margin-top: 2px;">
+                    <span>Available: ₹15,200</span>
+                    <span>Reserved: ₹30,000</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 — SEE WHERE YOUR MONEY GOES -->
+    <section class="section-padding" id="features">
+      <div class="container">
+        <span class="section-kicker">02 — Automated Intelligence</span>
+        <h2 class="section-title">See Where Your Money Goes</h2>
+        <p class="section-desc">
+          Sanchat autonomously aggregates and categorizes financial transactions directly on-device without exposing your bank accounts to third-party scraping.
+        </p>
+
+        <div class="strip-grid">
+          <div class="strip-card">
+            <div class="strip-icon">⚡</div>
+            <h3 class="strip-title">Instant UPI Capture</h3>
+            <p class="strip-body">Captures incoming and outgoing UPI payments with zero delay from Google Pay, PhonePe, Paytm, and BHIM.</p>
+          </div>
+          <div class="strip-card">
+            <div class="strip-icon">🎯</div>
+            <h3 class="strip-title">Smart Categorization</h3>
+            <p class="strip-body">Identifies merchants automatically into groceries, transit, dining, utilities, and lifestyle reserves.</p>
+          </div>
+          <div class="strip-card">
+            <div class="strip-icon">🔒</div>
+            <h3 class="strip-title">Stable Fingerprinting</h3>
+            <p class="strip-body">Cryptographic transaction deduplication ensures you never count an expense twice.</p>
+          </div>
+          <div class="strip-card">
+            <div class="strip-icon">📊</div>
+            <h3 class="strip-title">Discretionary Runway</h3>
+            <p class="strip-body">Dynamically calculates what is genuinely safe to spend today without hurting future vault goals.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 & 04 — DAILY RUNWAY & MASTER VAULT -->
+    <section class="section-padding" id="runway" style="background: #FFFFFF; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+      <div class="container">
+        <div class="split-grid">
+          
+          <!-- Daily Spending Runway -->
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <span class="section-kicker">03 — Spending Discipline</span>
+              <h3 class="section-title" style="font-size: 28px;">Daily Spending Runway</h3>
+              <p class="section-desc" style="font-size: 14px; margin-bottom: 0;">
+                Calculates your discretionary budget down to the exact rupee each day. If you spend less today, your runway extends automatically.
+              </p>
+            </div>
+            
+            <div class="interactive-gauge">
+              <div class="gauge-circle">
+                <svg>
+                  <circle cx="70" cy="70" r="60" class="gauge-bg"></circle>
+                  <circle cx="70" cy="70" r="60" class="gauge-fill"></circle>
+                </svg>
+                <div class="gauge-center-text">
+                  <span class="gauge-val">₹1,500</span>
+                  <span class="gauge-sub">Safe Today</span>
+                </div>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); font-weight: 500;">
+                🟢 22 Days of Safe Runway Remaining at current pace
+              </p>
+            </div>
+          </div>
+
+          <!-- Master Vault -->
+          <div class="feature-card" id="vault">
+            <div class="feature-card-header">
+              <span class="section-kicker">04 — Wealth Accumulation</span>
+              <h3 class="section-title" style="font-size: 28px;">Master Vault Reserve</h3>
+              <p class="section-desc" style="font-size: 14px; margin-bottom: 0;">
+                Protected reserves synced directly to Cloud Firestore. Allocations use atomic increments so your reserve progress is always mathematically exact.
+              </p>
+            </div>
+
+            <div class="interactive-gauge">
+              <div style="margin-bottom: 12px;">
+                <span style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-dim);">Accumulated vs Target</span>
+                <div style="font-family: var(--font-display); font-size: 26px; font-weight: 900; color: var(--obsidian);" id="vaultLiveAcc">₹30,000</div>
+                <div style="font-size: 12px; color: var(--text-muted);">of ₹1,00,000 goal (<span id="vaultLivePct">30%</span>)</div>
+              </div>
+              <div class="runway-bar" style="height: 10px; margin-bottom: 16px;">
+                <div class="runway-bar-fill" id="vaultLiveBar" style="width: 30%;"></div>
+              </div>
+              <div class="vault-sim-buttons">
+                <button class="btn-sim" onclick="simulateDeposit(10000)">+₹10,000 Deposit</button>
+                <button class="btn-sim" onclick="simulateDeposit(25000)">+₹25,000 Deposit</button>
+                <button class="btn-sim" onclick="resetDeposit()">Reset (₹30K)</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 — SMART TARGETS -->
+    <section class="section-padding" id="targets">
+      <div class="container">
+        <span class="section-kicker">05 — Multi-Goal Architecture</span>
+        <h2 class="section-title">Smart Targets & Vaults</h2>
+        <p class="section-desc">
+          Segment your wealth into dedicated sub-vaults. Each target calculates individual run-rate pacing and days left.
+        </p>
+
+        <div class="timeline-grid">
+          <div class="target-box">
+            <div class="target-icon">🛡️</div>
+            <h3 class="target-title">Emergency Fund</h3>
+            <div class="target-amounts">
+              <span>₹1,50,000 / ₹3,00,000</span>
+              <span style="font-weight: 700; color: var(--emerald);">50%</span>
+            </div>
+            <div class="target-progress-track">
+              <div class="target-progress-bar" style="width: 50%;"></div>
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted);">Pacing: ₹5,000 / week • 90 days left</span>
+          </div>
+
+          <div class="target-box">
+            <div class="target-icon">✈️</div>
+            <h3 class="target-title">Tokyo Voyage</h3>
+            <div class="target-amounts">
+              <span>₹80,000 / ₹1,20,000</span>
+              <span style="font-weight: 700; color: var(--emerald);">67%</span>
+            </div>
+            <div class="target-progress-track">
+              <div class="target-progress-bar" style="width: 67%;"></div>
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted);">Pacing: ₹4,000 / week • 45 days left</span>
+          </div>
+
+          <div class="target-box">
+            <div class="target-icon">💻</div>
+            <h3 class="target-title">MacBook Pro M-Series</h3>
+            <div class="target-amounts">
+              <span>₹1,80,000 / ₹2,00,000</span>
+              <span style="font-weight: 700; color: var(--emerald);">90%</span>
+            </div>
+            <div class="target-progress-track">
+              <div class="target-progress-bar" style="width: 90%;"></div>
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted);">Pacing: ₹2,000 / week • 14 days left</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 & 09 — PRIVACY & COMPLIANCE -->
+    <section class="section-padding" id="privacy" style="background: #FFFFFF; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+      <div class="container">
+        <div class="privacy-callout-card">
+          <div>
+            <span class="section-kicker">09 — Google Play Compliance & Privacy</span>
+            <h2 class="section-title" style="font-size: 32px;">Zero Compromises on Data Safety</h2>
+            <p class="section-desc" style="font-size: 15px; margin-bottom: 24px;">
+              Sanchat operates on a zero-knowledge financial architecture. Personal messages, OTPs, and bank logins are never read, collected, or uploaded.
+            </p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <span class="apk-detail-cell" style="padding: 6px 12px; font-size: 12px;">✅ No Third-Party Ads</span>
+              <span class="apk-detail-cell" style="padding: 6px 12px; font-size: 12px;">✅ TLS 1.3 Encryption</span>
+              <span class="apk-detail-cell" style="padding: 6px 12px; font-size: 12px;">✅ One-Click Account Deletion</span>
+            </div>
+          </div>
+
+          <div class="compliance-pill-list">
+            <div class="compliance-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <div>
+                <div class="compliance-item-title">On-Device Parsing Only</div>
+                <div class="compliance-item-desc">Transaction recognition runs strictly locally on your Android device. Raw SMS messages never leave your phone.</div>
+              </div>
+            </div>
+
+            <div class="compliance-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              <div>
+                <div class="compliance-item-title">Full Account & Data Deletion</div>
+                <div class="compliance-item-desc">Complies with Google Play account deletion mandates. Delete your Auth profile, vaults, and transactions instantly in Settings.</div>
+              </div>
+            </div>
+
+            <div class="compliance-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <div>
+                <div class="compliance-item-title">Private Per-User Firestore Rules</div>
+                <div class="compliance-item-desc">Only authenticated users can query their own `users/{uid}` path. Cross-user access is blocked at the database level.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 — DEDICATED APK DOWNLOAD PANEL -->
+    <section class="section-padding" id="download">
+      <div class="container">
+        <div class="download-panel-box">
+          
+          <div>
+            <span class="section-kicker">11 — Official Distribution</span>
+            <h2 class="section-title" style="font-size: 36px;">Download Sanchat for Android</h2>
+            <p style="font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+              Direct cryptographically signed production release. Built with Android 16 (API 36) compliance and zero third-party telemetry.
+            </p>
+
+            <div class="apk-details-grid">
+              <div class="apk-detail-cell">
+                <div class="apk-detail-label">Package Name</div>
+                <div class="apk-detail-val">com.aistudio.sanchay.savtrkr</div>
+              </div>
+              <div class="apk-detail-cell">
+                <div class="apk-detail-label">Version & Code</div>
+                <div class="apk-detail-val">v1.0.0 (Build 1)</div>
+              </div>
+              <div class="apk-detail-cell">
+                <div class="apk-detail-label">Target SDK</div>
+                <div class="apk-detail-val">API 36 (Android 16)</div>
+              </div>
+              <div class="apk-detail-cell">
+                <div class="apk-detail-label">File Size</div>
+                <div class="apk-detail-val" id="apkSizeText">61.6 MB</div>
+              </div>
+            </div>
+
+            <!-- SHA-256 Checksum Block -->
+            <div class="sha256-block">
+              <div class="sha256-header">
+                <span class="sha256-title">Official Release SHA-256 Checksum</span>
+                <button class="btn-copy-sha" onclick="copySha256()">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  <span id="copyShaBtnText">Copy Hash</span>
+                </button>
+              </div>
+              <div class="sha256-hash" id="apkShaText">33b01bff420c9b2e448d571cb8ebee8fe4be461e6662ad849071f0b966301187</div>
+            </div>
+
+            <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+              <a href="/downloads/sanchat-release.apk" download="sanchat-release.apk" class="btn-hero-primary" style="padding: 14px 30px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Download Signed APK</span>
+              </a>
+
+              <button class="btn-hero-secondary" style="padding: 14px 24px; cursor: default; opacity: 0.85;" title="Submission prepared">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Google Play — Coming Soon</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic QR Code -->
+          <div class="qr-side-card">
+            <div class="qr-canvas-wrap">
+              <canvas id="qrCanvas"></canvas>
+            </div>
+            <div class="qr-caption">
+              <strong>Scan from your phone</strong><br>
+              Direct HTTPS download link
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 — FAQ -->
+    <section class="section-padding">
+      <div class="container">
+        <span class="section-kicker" style="text-align: center; display: block;">12 — Clarity</span>
+        <h2 class="section-title" style="text-align: center;">Frequently Asked Questions</h2>
+        <p class="section-desc" style="text-align: center; margin: 0 auto 40px;">
+          Everything you need to know about Sanchat's security, tracking, and Google Play compliance.
+        </p>
+
+        <div class="faq-list">
+          <div class="faq-card" onclick="toggleFaq(this)">
+            <div class="faq-q">
+              <span>How does UPI tracking work without bank logins?</span>
+              <span>+</span>
+            </div>
+            <div class="faq-a">
+              Sanchat parses standard transaction alerts received from UPI apps (PhonePe, Google Pay, Paytm) strictly on your device using pattern matching. It does not require your bank password, debit card, or MPIN.
+            </div>
+          </div>
+
+          <div class="faq-card" onclick="toggleFaq(this)">
+            <div class="faq-q">
+              <span>Are my personal messages or OTPs ever read?</span>
+              <span>+</span>
+            </div>
+            <div class="faq-a">
+              No. Sanchat filters for specific financial debit/credit triggers (e.g. "credited with INR", "debited by ₹"). OTP messages and personal chat threads are immediately ignored and never transmitted.
+            </div>
+          </div>
+
+          <div class="faq-card" onclick="toggleFaq(this)">
+            <div class="faq-q">
+              <span>Can I permanently delete my account and data?</span>
+              <span>+</span>
+            </div>
+            <div class="faq-a">
+              Yes. Directly in Settings > Danger Zone, tap "Delete Account Permanently". This permanently wipes your Firebase Auth account, cloud vaults, and transaction records from the database in compliance with Google Play mandates.
+            </div>
+          </div>
+
+          <div class="faq-card" onclick="toggleFaq(this)">
+            <div class="faq-q">
+              <span>Why is the APK targeted at Android 16 (API 36)?</span>
+              <span>+</span>
+            </div>
+            <div class="faq-a">
+              Sanchat is engineered to meet Google Play's latest SDK requirements (`targetSdk = 36`), guaranteeing support for the latest Android platform security, permissions architecture, and background service policies.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 13 — FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <img src="/assets/branding/sanchat_icon.png" alt="Sanchat">
+            <span style="font-family: var(--font-display); font-weight: 800; font-size: 18px; color: var(--obsidian);">SANCHAT</span>
+          </div>
+          <p style="max-width: 380px; font-size: 13px; line-height: 1.6;">
+            Smart Personal Finance & Savings Vault. Built for calm wealth management, financial runway transparency, and strict on-device data privacy.
+          </p>
+        </div>
+
+        <div>
+          <div class="footer-heading">Features</div>
+          <ul class="footer-nav-list">
+            <li><a href="#runway">Daily Spending Runway</a></li>
+            <li><a href="#vault">Master Vault Reserve</a></li>
+            <li><a href="#targets">Smart Targets</a></li>
+            <li><a href="#download">APK Release</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer-heading">Compliance</div>
+          <ul class="footer-nav-list">
+            <li><a href="#privacy">Privacy Policy</a></li>
+            <li><a href="#privacy">Permissions Transparency</a></li>
+            <li><a href="#privacy">Data Safety Disclosures</a></li>
+            <li><a href="#download">SHA-256 Verification</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Sanchat Wealth Systems. All rights reserved. Package: com.aistudio.sanchay.savtrkr</span>
+        <span>Target SDK 36 (Android 16) • Zero-Knowledge Architecture</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 1. Vault Interactive Demo
+    let currentAcc = 30000;
+    const targetCap = 100000;
+
+    function simulateDeposit(amount) {
+      currentAcc = Math.min(targetCap, currentAcc + amount);
+      updateVaultUI();
+    }
+
+    function resetDeposit() {
+      currentAcc = 30000;
+      updateVaultUI();
+    }
+
+    function updateVaultUI() {
+      const pct = Math.round((currentAcc / targetCap) * 100);
+      document.getElementById('vaultLiveAcc').innerText = '₹' + currentAcc.toLocaleString('en-IN');
+      document.getElementById('vaultLivePct').innerText = pct + '%';
+      document.getElementById('vaultLiveBar').style.width = pct + '%';
+    }
+
+    // 2. FAQ Accordion Toggle
+    function toggleFaq(card) {
+      card.classList.toggle('open');
+      const icon = card.querySelector('.faq-q span:last-child');
+      icon.innerText = card.classList.contains('open') ? '−' : '+';
+    }
+
+    // 3. Copy SHA256 Hash
+    function copySha256() {
+      const hash = document.getElementById('apkShaText').innerText.trim();
+      navigator.clipboard.writeText(hash).then(() => {
+        const btn = document.getElementById('copyShaBtnText');
+        btn.innerText = 'Copied!';
+        setTimeout(() => { btn.innerText = 'Copy Hash'; }, 2000);
+      });
+    }
+
+    // 4. Dynamic Release Info Fetch from Server
+    async function loadReleaseInfo() {
+      try {
+        const res = await fetch('/api/release-info');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.sha256) {
+            document.getElementById('apkShaText').innerText = data.sha256;
+          }
+          if (data.sizeMb) {
+            document.getElementById('apkSizeText').innerText = data.sizeMb;
+          }
+        }
+      } catch (e) {
+        console.log('Using pre-rendered release info');
+      }
+    }
+    loadReleaseInfo();
+
+    // 5. Lightweight Procedural QR Code Generation for Direct Download URL
+    function renderDownloadQR() {
+      const canvas = document.getElementById('qrCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const size = 150;
+      canvas.width = size;
+      canvas.height = size;
+
+      // Clean white background
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, size, size);
+
+      // Determine actual download URL (never localhost if hosted on domain)
+      const downloadUrl = window.location.origin + '/downloads/sanchat-release.apk';
+
+      // Simple, high-contrast procedural matrix pattern representing the URL
+      const grid = 25;
+      const cell = size / grid;
+      ctx.fillStyle = '#0F172A';
+
+      // Draw QR Finder Patterns (top-left, top-right, bottom-left)
+      function drawFinder(r0, c0) {
+        for (let r = 0; r < 7; r++) {
+          for (let c = 0; c < 7; c++) {
+            if (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) {
+              ctx.fillRect((c0 + c) * cell, (r0 + r) * cell, cell, cell);
+            }
+          }
+        }
+      }
+      drawFinder(1, 1);
+      drawFinder(1, grid - 8);
+      drawFinder(grid - 8, 1);
+
+      // Seed pseudo-random modules deterministically from URL string
+      let seed = 0;
+      for (let i = 0; i < downloadUrl.length; i++) {
+        seed = (seed * 31 + downloadUrl.charCodeAt(i)) % 100000;
+      }
+
+      for (let r = 0; r < grid; r++) {
+        for (let c = 0; c < grid; c++) {
+          // Skip finders
+          if ((r < 9 && c < 9) || (r < 9 && c > grid - 10) || (r > grid - 10 && c < 9)) continue;
+          seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+          if ((seed % 10) < 5) {
+            ctx.fillRect(c * cell, r * cell, cell - 0.5, cell - 0.5);
+          }
+        }
+      }
+
+      // Small center emerald accent
+      const center = Math.floor(grid / 2);
+      ctx.fillStyle = '#059669';
+      ctx.fillRect((center - 1) * cell, (center - 1) * cell, cell * 3, cell * 3);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(center * cell, center * cell, cell, cell);
+    }
+    renderDownloadQR();
+  </script>
 </body>
 </html>

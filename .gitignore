@@ -74,3 +74,9 @@ serviceAccount*.json
 *.cer
 *.key
 google-services-private.json
+
+.vercel
+node_modules
+
+.next
+out

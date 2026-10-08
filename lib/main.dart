@@ -17,6 +17,7 @@ import 'screens/preferences_screen.dart';
 import 'screens/targets_screen.dart';
 import 'screens/app_guide_screen.dart';
 import 'services/auth_service.dart';
+import 'services/fcm_service.dart';
 import 'services/notification_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/sanchay_logo.dart';
@@ -67,7 +68,7 @@ Future<void> initializeAppSafe() async {
     debugPrint('Initial public profile sync error: $e');
   }
 
-  // 4. Non-blocking NotificationService initialization (strict 3-second timeout)
+  // 4. Non-blocking NotificationService & FcmService initialization (strict 3-second timeout)
   try {
     await NotificationService().initialize().timeout(
       const Duration(seconds: 3),
@@ -75,6 +76,15 @@ Future<void> initializeAppSafe() async {
     );
   } catch (e) {
     debugPrint('NotificationService init error: $e');
+  }
+
+  try {
+    await FcmService().initialize().timeout(
+      const Duration(seconds: 3),
+      onTimeout: () => debugPrint('FcmService init timed out, continuing...'),
+    );
+  } catch (e) {
+    debugPrint('FcmService init error: $e');
   }
 }
 
@@ -108,6 +118,7 @@ class SanchayApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: FcmService.navigatorKey,
       title: 'Sanchat Wealth',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

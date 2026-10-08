@@ -276,8 +276,10 @@ class AuthService {
       final publicProfileData = {
         'uid': uid,
         'handle': handle,
+        'handle_lowercase': handle.trim().toLowerCase(),
         'email': effectiveEmail,
         'displayName': effectiveName,
+        'displayName_lowercase': effectiveName.trim().toLowerCase(),
         'avatarUrl': effectiveAvatar,
         'isVerified': true,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -303,11 +305,14 @@ class AuthService {
     final handle = user.email != null && user.email!.contains('@')
         ? user.email!.split('@').first.toLowerCase()
         : (user.uid.length >= 8 ? user.uid.substring(0, 8) : user.uid);
+    final displayName = user.displayName ?? handle;
 
     final publicProfileData = {
       'uid': user.uid,
       'handle': handle,
-      'displayName': user.displayName ?? handle,
+      'handle_lowercase': handle.trim().toLowerCase(),
+      'displayName': displayName,
+      'displayName_lowercase': displayName.trim().toLowerCase(),
       'email': user.email ?? '',
       'avatarUrl': user.photoURL ?? '',
       'isVerified': true,

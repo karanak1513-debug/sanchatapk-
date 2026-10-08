@@ -214,6 +214,14 @@ class SanchayProvider extends ChangeNotifier {
   int get vaultPercentage => (vaultProgress * 100).round();
   double get amountToTarget => (goalCap - currentSavings).clamp(0.0, goalCap);
 
+  int get currentLevel {
+    if (currentSavings <= 0) return 1;
+    final lvl = ((currentSavings / 1000).floor() + 1).clamp(1, 100);
+    return lvl;
+  }
+
+  double get currentMonthExpense => totalDebits;
+
   int get remainingDaysToTarget {
     if (primaryTarget != null) return primaryTarget!.remainingDays;
     final now = DateTime.now();
