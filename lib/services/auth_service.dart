@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../widgets/center_hud_alert.dart';
+import 'fcm_service.dart';
 import 'profile_service.dart';
 
 class AuthService {
@@ -183,6 +184,10 @@ class AuthService {
 
   Future<void> signOut() async {
     try {
+      final currentUid = _auth.currentUser?.uid;
+      if (currentUid != null && currentUid.isNotEmpty) {
+        await FcmService().unregisterTokenOnLogout(explicitUid: currentUid);
+      }
       if (!kIsWeb) {
         await GoogleSignIn().signOut();
       }
@@ -198,6 +203,9 @@ class AuthService {
     String? overrideEmail,
   }) async {
     final uid = user?.uid ?? currentUserId;
+    if (uid.isNotEmpty) {
+      unawaited(FcmService().registerCurrentDeviceToken(explicitUid: uid));
+    }
     try {
       final docRef = _firestore
           .collection('users')

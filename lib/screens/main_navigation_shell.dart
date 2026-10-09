@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/chat_service.dart';
+import '../services/fcm_service.dart';
 import '../services/friend_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/add_transaction_modal.dart';
@@ -33,6 +34,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     ChatService().syncCurrentUserProfile();
     FriendService().startFriendRequestListener();
     _initSessionCount();
+
+    // Check for pending cold-start notification navigation and ensure device token is synced
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FcmService().registerCurrentDeviceToken();
+      FcmService().checkAndNavigatePendingInitialMessage(context);
+    });
   }
 
   Future<void> _initSessionCount() async {

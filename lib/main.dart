@@ -112,6 +112,9 @@ void main() async {
   );
 }
 
+final RouteObserver<PageRoute<dynamic>> routeObserver =
+    RouteObserver<PageRoute<dynamic>>();
+
 class SanchayApp extends StatelessWidget {
   const SanchayApp({super.key});
 
@@ -119,6 +122,7 @@ class SanchayApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: FcmService.navigatorKey,
+      navigatorObservers: [routeObserver],
       title: 'Sanchat Wealth',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

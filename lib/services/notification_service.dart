@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +9,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import '../models/transaction.dart';
+import 'auth_service.dart';
+import 'chat_service.dart';
+import 'fcm_service.dart';
 
 class NotificationService {
   static const MethodChannel _channel =
@@ -17,8 +22,28 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin get localNotifications => _localNotifications;
 
   bool _isInitialized = false;
+
+  // Deduplication cache for chat message notifications
+  static final Set<String> _recentlyNotifiedMessageIds = <String>{};
+  static final List<String> _notifiedMessageIdOrder = <String>[];
+  static const int _maxDeduplicationCacheSize = 250;
+
+  static bool isMessageRecentlyNotified(String messageId) {
+    return _recentlyNotifiedMessageIds.contains(messageId);
+  }
+
+  static void markMessageAsNotified(String messageId) {
+    if (_recentlyNotifiedMessageIds.contains(messageId)) return;
+    if (_notifiedMessageIdOrder.length >= _maxDeduplicationCacheSize) {
+      final oldest = _notifiedMessageIdOrder.removeAt(0);
+      _recentlyNotifiedMessageIds.remove(oldest);
+    }
+    _recentlyNotifiedMessageIds.add(messageId);
+    _notifiedMessageIdOrder.add(messageId);
+  }
 
   NotificationService._internal() {
     _channel.setMethodCallHandler(_handleNativeCall);
@@ -57,6 +82,9 @@ class NotificationService {
           initSettings,
           onDidReceiveNotificationResponse: (details) {
             debugPrint('Notification clicked: ${details.payload}');
+            if (details.payload != null && details.payload!.isNotEmpty) {
+              FcmService().handleNotificationPayload(details.payload!);
+            }
           },
         );
 
@@ -66,6 +94,29 @@ class NotificationService {
         if (androidImpl != null) {
           await androidImpl.requestNotificationsPermission();
           await androidImpl.requestExactAlarmsPermission();
+
+          // Explicitly create notification channels for foreground & heads-up display
+          const socialChannel = AndroidNotificationChannel(
+            'sanchay_social_alerts',
+            'Sanchat Social & Messages',
+            description: 'Real-time notifications for friend requests and 1-on-1 chats',
+            importance: Importance.max,
+            playSound: true,
+            enableVibration: true,
+            showBadge: true,
+          );
+          await androidImpl.createNotificationChannel(socialChannel);
+
+          const reminderChannel = AndroidNotificationChannel(
+            'sanchay_daily_reminders',
+            'Sanchat Daily Goal Reminders',
+            description: 'Notifications for tracking daily savings pace and quota fulfillment',
+            importance: Importance.max,
+            playSound: true,
+            enableVibration: true,
+            showBadge: true,
+          );
+          await androidImpl.createNotificationChannel(reminderChannel);
         }
 
         // Verify & Prompt Alarms & Reminders permission via permission_handler
@@ -327,8 +378,34 @@ class NotificationService {
     required String senderName,
     required String messageText,
     String? chatId,
+    String? messageId,
+    String? senderId,
   }) async {
     await initialize();
+
+    // 1. Never send/display notification to sender for their own message
+    final currentUid =
+        FirebaseAuth.instance.currentUser?.uid ?? AuthService().currentUserId;
+    if (currentUid.isNotEmpty && senderId != null && senderId == currentUid) {
+      debugPrint('Suppressed notification: sender is current user');
+      return;
+    }
+
+    // 2. Do not show notification when recipient is actively viewing this same conversation
+    if (chatId != null && ChatService.isChatActive(chatId)) {
+      debugPrint('Suppressed notification: user is actively viewing chat $chatId');
+      return;
+    }
+
+    // 3. Stable message ID deduplication: ensure each message triggers at most one notification
+    if (messageId != null && messageId.isNotEmpty) {
+      if (_recentlyNotifiedMessageIds.contains(messageId)) {
+        debugPrint('Suppressed duplicate notification for messageId: $messageId');
+        return;
+      }
+      markMessageAsNotified(messageId);
+    }
+
     final title = senderName;
     final body = messageText;
 
@@ -336,11 +413,13 @@ class NotificationService {
       try {
         const androidDetails = AndroidNotificationDetails(
           'sanchay_social_alerts',
-          'Sanchay Social & Messages',
+          'Sanchat Social & Messages',
           channelDescription: 'Real-time notifications for friend requests and 1-on-1 chats',
           importance: Importance.max,
           priority: Priority.high,
           showWhen: true,
+          enableVibration: true,
+          playSound: true,
           color: Color(0xFF0F172A),
           icon: '@mipmap/ic_launcher',
         );
@@ -349,12 +428,27 @@ class NotificationService {
           presentBadge: true,
           presentSound: true,
         );
+
+        // Deterministic integer notification ID based on stable message/chat ID
+        final int notificationId = (messageId != null && messageId.isNotEmpty)
+            ? (messageId.hashCode & 0x7FFFFFFF)
+            : (chatId != null && chatId.isNotEmpty
+                ? (chatId.hashCode & 0x7FFFFFFF)
+                : 1002);
+
+        final payload = jsonEncode({
+          'type': 'chat_message',
+          'chatId': chatId ?? '',
+          'senderId': senderId ?? '',
+          'messageId': messageId ?? '',
+        });
+
         await _localNotifications.show(
-          DateTime.now().millisecondsSinceEpoch ~/ 1000,
+          notificationId,
           title,
           body,
           const NotificationDetails(android: androidDetails, iOS: darwinDetails),
-          payload: chatId,
+          payload: payload,
         );
       } catch (e) {
         debugPrint('Error showing chat message notification: $e');

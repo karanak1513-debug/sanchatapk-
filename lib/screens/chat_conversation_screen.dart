@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/chat_message.dart';
 import '../models/chat_user.dart';
+import '../main.dart' show routeObserver;
 import '../services/auth_service.dart';
 import '../services/chat_service.dart';
 import '../services/friend_service.dart';
@@ -50,7 +51,7 @@ class ChatConversationScreen extends StatefulWidget {
 }
 
 class _ChatConversationScreenState extends State<ChatConversationScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver, RouteAware {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
@@ -69,6 +70,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     try {
       _currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
     } catch (_) {
@@ -76,6 +78,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen>
     }
     _chatId = widget.chatId;
     _resolvedPeer = widget.peer;
+
+    // Track active chat immediately
+    ChatService.setActiveChat(_chatId);
 
     _springController = AnimationController(
       vsync: this,
@@ -101,6 +106,50 @@ class _ChatConversationScreenState extends State<ChatConversationScreen>
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final modalRoute = ModalRoute.of(context);
+    if (modalRoute is PageRoute) {
+      routeObserver.subscribe(this, modalRoute);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ChatService.setActiveChat(_chatId);
+    } else {
+      // Clear active chat if app is paused, inactive, detached or hidden
+      ChatService.clearActiveChat(_chatId);
+    }
+  }
+
+  @override
+  void didPush() {
+    ChatService.setActiveChat(_chatId);
+  }
+
+  @override
+  void didPopNext() {
+    // User returned to this conversation from a pushed screen above
+    ChatService.setActiveChat(_chatId);
+    if (_currentUid.isNotEmpty) {
+      _chatService.markMessagesAsSeen(widget.peerUid);
+    }
+  }
+
+  @override
+  void didPushNext() {
+    // User pushed another screen on top of this conversation
+    ChatService.clearActiveChat(_chatId);
+  }
+
+  @override
+  void didPop() {
+    ChatService.clearActiveChat(_chatId);
+  }
+
   Future<void> _fetchPeerDetails() async {
     final user = await _chatService.getUser(widget.peerUid);
     if (mounted && user != null) {
@@ -117,6 +166,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen>
 
   @override
   void dispose() {
+    routeObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
+    ChatService.clearActiveChat(_chatId);
     _messageSubscription?.cancel();
     _scrollController.dispose();
     _textController.dispose();

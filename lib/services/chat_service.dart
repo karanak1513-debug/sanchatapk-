@@ -6,7 +6,6 @@ import '../models/chat_message.dart';
 import '../models/chat_user.dart';
 import 'auth_service.dart';
 import 'friend_service.dart';
-import 'notification_service.dart';
 
 class ChatService {
   static final ChatService _instance = ChatService._internal();
@@ -21,6 +20,31 @@ class ChatService {
     } catch (_) {
       return '';
     }
+  }
+
+  // Active chat tracking for conversation-specific notification suppression
+  static String? _activeChatId;
+  static String? get activeChatId => _activeChatId;
+  static final ValueNotifier<String?> activeChatIdNotifier = ValueNotifier<String?>(null);
+
+  /// Sets the currently active conversation ID (e.g. when user enters a chat)
+  static void setActiveChat(String? chatId) {
+    _activeChatId = chatId;
+    activeChatIdNotifier.value = chatId;
+  }
+
+  /// Clears active chat state (e.g. when leaving conversation or app backgrounds)
+  static void clearActiveChat([String? chatId]) {
+    if (chatId == null || _activeChatId == chatId) {
+      _activeChatId = null;
+      activeChatIdNotifier.value = null;
+    }
+  }
+
+  /// Returns true if the user is currently viewing the specified conversation
+  static bool isChatActive(String? chatId) {
+    if (chatId == null || chatId.isEmpty || _activeChatId == null) return false;
+    return _activeChatId == chatId;
   }
 
   // In-memory optimistic message buffer keyed by chatId
@@ -1004,7 +1028,8 @@ class ChatService {
   }
 
   /// 8. Background Delivery Watcher: auto-marks incoming messages as 'delivered'
-  /// and triggers push/local notification for incoming unread messages
+  /// Push notifications are handled exclusively via server-side FCM Cloud Functions
+  /// and FcmService to eliminate duplicate and redundant notifications.
   StreamSubscription? startDeliveryWatcher() {
     final myUid = currentUid;
     if (myUid.isEmpty) return null;
@@ -1021,20 +1046,6 @@ class ChatService {
           final unreadForMe = (data?['unreadCount'] as Map?)?[myUid] ?? 0;
           if (unreadForMe > 0) {
             markMessagesAsDelivered(chatId, myUid);
-            if (change.type == DocumentChangeType.added || change.type == DocumentChangeType.modified) {
-              final lastMsg = (data?['lastMessage'] as String?) ?? '';
-              final participants = (data?['participants'] as List?)?.map((e) => e.toString()).toList() ?? [];
-              final senderId = participants.firstWhere((p) => p != myUid, orElse: () => '');
-              if (lastMsg.isNotEmpty && senderId.isNotEmpty) {
-                getUser(senderId).then((sender) {
-                  NotificationService().showChatMessageNotification(
-                    senderName: sender?.displayName ?? 'New Message',
-                    messageText: lastMsg,
-                    chatId: chatId,
-                  );
-                });
-              }
-            }
           }
         }
       }, onError: (e) {
