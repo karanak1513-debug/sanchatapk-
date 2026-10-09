@@ -136,7 +136,7 @@ export default function Navbar() {
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-obsidian text-white font-semibold text-sm"
                 >
                   <ArrowDownToLine className="w-4 h-4 text-emeraldAccent" />
-                  <span>Download Sanchat APK (62.4 MB)</span>
+                  <span>Download Sanchat APK (62.3 MB)</span>
                 </a>
                 <div className="text-center text-xs text-slateText font-mono pt-1">
                   SHA-256 Verified • Target SDK 36
