@@ -1,0 +1,13 @@
+{
+  "name": "sanchat-backend",
+  "version": "1.0.0",
+  "description": "Sanchat Backend API, APK Distribution & Web Showcase Server",
+  "main": "serve_sanchay.js",
+  "scripts": {
+    "start": "node serve_sanchay.js",
+    "start:apk": "node serve_apk.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

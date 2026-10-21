@@ -1,0 +1,28 @@
+services:
+  # 1. Frontend: Next.js 14 Web Application & Cockpit
+  - type: web
+    name: sanchat-frontend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+
+  # 2. Backend: Sanchat API & APK Distribution Server
+  - type: web
+    name: sanchat-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
