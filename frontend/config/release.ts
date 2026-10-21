@@ -1,0 +1,23 @@
+export const RELEASE_CONFIG = {
+  appName: 'Sanchat',
+  packageId: 'com.aistudio.sanchay.savtrkr',
+  version: '1.0.0+1',
+  versionName: '1.0.0',
+  versionCode: 1,
+  targetSdk: 'Android 16 (API 36)',
+  minSdk: 'Android 7.0+ (API 24)',
+  compileSdk: 'Android 16+ (API 37)',
+  filename: 'sanchat-release.apk',
+  sizeBytes: 65337583,
+  sizeFormatted: '62.3 MB (65,337,583 bytes)',
+  sha256: '905aac530073d5a68e1674b2466d7d1e4e373333b948979a2c0287dfe1237288',
+  signatureScheme: 'APK Signature Scheme v1, v2, v3 (Signed)',
+  signerSubject: 'CN=Sanchay, OU=Fintech, O=Sanchay, L=Delhi, ST=Delhi, C=IN',
+  downloadRoute: '/download',
+  officialDomain: 'https://stitchsanchaywealthappuisystem.vercel.app',
+  githubReleaseUrl: 'https://github.com/karanak1513-debug/sanchat-core-apk/releases/tag/v1.0.0',
+  githubDirectDownloadUrl:
+    'https://github.com/karanak1513-debug/sanchat-core-apk/releases/latest/download/sanchat-release.apk',
+  githubAssetId: 622589419,
+  githubRepo: 'karanak1513-debug/sanchat-core-apk',
+};

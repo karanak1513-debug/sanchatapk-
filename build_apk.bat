@@ -7,6 +7,8 @@ echo ========================================================
 echo  Compiling Sanchay Production Release APK
 echo ========================================================
 
+pushd "%~dp0mobile"
+
 echo [1/4] Cleaning build cache...
 call C:\src\flutter\bin\flutter.bat clean
 
@@ -18,6 +20,7 @@ call C:\src\flutter\bin\flutter.bat build apk --release
 
 if %errorlevel% neq 0 (
     echo [ERROR] Flutter build failed with exit code %errorlevel%
+    popd
     pause
     exit /b %errorlevel%
 )
@@ -25,10 +28,13 @@ if %errorlevel% neq 0 (
 echo [4/4] Updating distribution artifacts...
 if exist "build\app\outputs\flutter-apk\app-release.apk" (
     copy /Y "build\app\outputs\flutter-apk\app-release.apk" "sanchay-release.apk"
-    echo Successfully updated sanchay-release.apk!
+    copy /Y "build\app\outputs\flutter-apk\app-release.apk" "..\"
+    copy /Y "build\app\outputs\flutter-apk\app-release.apk" "..\frontend\public\"
+    echo Successfully updated sanchay-release.apk across mobile and frontend!
 )
+popd
 
 echo ========================================================
-echo  BUILD COMPLETE: build\app\outputs\flutter-apk\app-release.apk
+echo  BUILD COMPLETE: mobile\build\app\outputs\flutter-apk\app-release.apk
 echo ========================================================
 pause

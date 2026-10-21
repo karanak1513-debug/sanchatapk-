@@ -5,14 +5,19 @@ const os = require('os');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 8080;
+const ROOT_DIR = path.join(__dirname, '..');
 const BASE_DIR = __dirname;
-const LANDING_PATH = path.join(BASE_DIR, 'web', 'landing.html');
-const BRANDING_DIR = path.join(BASE_DIR, 'assets', 'branding');
-const WEB_DIR = path.join(BASE_DIR, 'web');
+const LANDING_PATH = fs.existsSync(path.join(BASE_DIR, 'index.html'))
+  ? path.join(BASE_DIR, 'index.html')
+  : path.join(ROOT_DIR, 'mobile', 'web', 'landing.html');
+const BRANDING_DIR = path.join(ROOT_DIR, 'mobile', 'assets', 'branding');
+const WEB_DIR = path.join(ROOT_DIR, 'mobile', 'web');
 
 function getReleaseApkInfo() {
   const candidatePaths = [
-    path.join(BASE_DIR, 'build', 'app', 'outputs', 'flutter-apk', 'app-release.apk'),
+    path.join(ROOT_DIR, 'mobile', 'build', 'app', 'outputs', 'flutter-apk', 'app-release.apk'),
+    path.join(ROOT_DIR, 'mobile', 'sanchay-release.apk'),
+    path.join(ROOT_DIR, 'frontend', 'public', 'sanchay-release.apk'),
     path.join(BASE_DIR, 'sanchay-release.apk'),
     path.join(BASE_DIR, 'app-release.apk'),
   ];

@@ -3,19 +3,29 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 
-const PORT = 3000;
-const BUILD_WEB_DIR = path.join(__dirname, 'build', 'web');
-const LANDING_PATH = path.join(__dirname, 'web', 'landing.html');
-const PRIVACY_PATH = path.join(__dirname, 'web', 'privacy.html');
-const TERMS_PATH = path.join(__dirname, 'web', 'terms.html');
-const NOT_FOUND_PATH = path.join(__dirname, 'web', '404.html');
-const ROBOTS_PATH = path.join(__dirname, 'web', 'robots.txt');
-const SITEMAP_PATH = path.join(__dirname, 'web', 'sitemap.xml');
-const COCKPIT_PATH = path.join(__dirname, 'stitch_sanchay_wealth_app_ui_system', 'dashboard_cockpit', 'code.html');
+const PORT = process.env.PORT || 3000;
+const ROOT_DIR = path.join(__dirname, '..');
+const BUILD_WEB_DIR = path.join(ROOT_DIR, 'mobile', 'build', 'web');
+const LANDING_PATH = fs.existsSync(path.join(__dirname, 'index.html'))
+  ? path.join(__dirname, 'index.html')
+  : path.join(ROOT_DIR, 'mobile', 'web', 'landing.html');
+const PRIVACY_PATH = fs.existsSync(path.join(__dirname, 'privacy.html'))
+  ? path.join(__dirname, 'privacy.html')
+  : path.join(ROOT_DIR, 'mobile', 'web', 'privacy.html');
+const TERMS_PATH = fs.existsSync(path.join(__dirname, 'terms.html'))
+  ? path.join(__dirname, 'terms.html')
+  : path.join(ROOT_DIR, 'mobile', 'web', 'terms.html');
+const NOT_FOUND_PATH = path.join(ROOT_DIR, 'mobile', 'web', '404.html');
+const ROBOTS_PATH = path.join(ROOT_DIR, 'mobile', 'web', 'robots.txt');
+const SITEMAP_PATH = path.join(ROOT_DIR, 'mobile', 'web', 'sitemap.xml');
+const COCKPIT_PATH = path.join(ROOT_DIR, 'frontend', 'stitch_sanchay_wealth_app_ui_system', 'dashboard_cockpit', 'code.html');
 
-const APK_PATH = fs.existsSync(path.join(__dirname, 'build', 'app', 'outputs', 'flutter-apk', 'app-release.apk'))
-  ? path.join(__dirname, 'build', 'app', 'outputs', 'flutter-apk', 'app-release.apk')
-  : path.join(__dirname, 'sanchay-release.apk');
+const APK_PATH = [
+  path.join(ROOT_DIR, 'mobile', 'build', 'app', 'outputs', 'flutter-apk', 'app-release.apk'),
+  path.join(ROOT_DIR, 'mobile', 'sanchay-release.apk'),
+  path.join(ROOT_DIR, 'frontend', 'public', 'sanchay-release.apk'),
+  path.join(__dirname, 'sanchay-release.apk')
+].find(p => fs.existsSync(p)) || path.join(ROOT_DIR, 'mobile', 'sanchay-release.apk');
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',

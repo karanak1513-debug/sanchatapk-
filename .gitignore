@@ -1,13 +1,13 @@
 # Android Security & Signing Keys (ABSOLUTE BLOCK)
 *.jks
 *.keystore
-android/key.properties
-android/app/*.jks
-android/app/*.keystore
+**/key.properties
+**/android/app/*.jks
+**/android/app/*.keystore
 
 # Google & Firebase Private Secrets
-android/app/google-services.json
-ios/Runner/GoogleService-Info.plist
+**/google-services.json
+**/GoogleService-Info.plist
 firebase_options.dart.secret
 *.secrets.json
 
